@@ -27,7 +27,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden}
   font-family:var(--sans);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
 #stage canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
 #bg{z-index:0}#win{z-index:3}#composer{z-index:4}#ububble{z-index:5}#mark{z-index:5}#copy{z-index:6}#lockup{z-index:6}
-#rip{z-index:7}#ptr{z-index:7}#vig{z-index:8}#grain{z-index:9}
+#rip{z-index:7}#ptr{z-index:7}#vig{z-index:8}
 
 /* headline column */
 #copy{position:absolute;left:0;top:0;width:808px;height:1080px}
@@ -128,7 +128,6 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden}
 #ptr svg{display:block;filter:drop-shadow(0 6px 12px rgba(0,0,0,.55))}
 #rip{position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:1.5px solid rgba(244,244,244,.8);visibility:hidden}
 #vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 100% at 56% 50%,transparent 56%,rgba(0,0,0,.55) 100%)}
-#grain{opacity:.05}
 
 /* live preview controls (hidden while rendering) */
 #ui{position:fixed;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;gap:14px;padding:0 18px;z-index:10;
@@ -201,7 +200,6 @@ body:hover #ui{opacity:1}
   <div id="rip"></div>
   <div id="ptr"><svg width="26" height="30" viewBox="0 0 26 30"><path d="M3 2v22l6-5.5 4 9 4-1.7-4-8.8h8z" fill="#f4f4f4" stroke="#0a0a0a" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
   <div id="vig"></div>
-  <canvas id="grain" width="1920" height="1080"></canvas>
 </div>
 <div id="ui"><button id="pp" type="button">Pause</button><div class="bar"><i></i></div><span class="tc">0.00 / 29.00</span></div>
 
@@ -989,23 +987,6 @@ function drawLockup(t) {
   LK.ring.style.opacity = on ? (0.8 * (1 - pr)).toFixed(3) : 0;
 }
 
-/* ---------- film grain ---------- */
-const gctx = $('#grain').getContext('2d');
-const tiles = [0, 1, 2, 3, 4, 5].map(k => {
-  const c = document.createElement('canvas');
-  c.width = c.height = 256;
-  const g = c.getContext('2d'), id = g.createImageData(256, 256), R = mulberry32(900 + k);
-  for (let i = 0; i < id.data.length; i += 4) { const v = (R() * 255) | 0; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; }
-  g.putImageData(id, 0, 0);
-  return gctx.createPattern(c, 'repeat');
-});
-function drawGrain(t) {
-  const f = Math.floor(t * 30), ox = (hash(f, 1) * 256) | 0, oy = (hash(f, 2) * 256) | 0;
-  gctx.setTransform(1, 0, 0, 1, -ox, -oy);
-  gctx.fillStyle = tiles[f % tiles.length];
-  gctx.fillRect(ox, oy, W, H);
-}
-
 /* ---------- frame ---------- */
 function render(t) {
   t = clamp(t, 0, DUR);
@@ -1029,7 +1010,6 @@ function render(t) {
   drawHeadlines(t);
   drawLockup(t);
   drawPointer(t);
-  drawGrain(t);
 }
 
 /* ---------- cue sheet (drives the soundtrack) ---------- */

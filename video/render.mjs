@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Frame-accurate render of index.html: headless Chromium seeks the timeline frame by frame,
-// ffmpeg encodes the PNG stream, then the generated score is muxed in.
+// ffmpeg encodes the PNG stream (H.264, CRF 18), then the generated score is muxed in.
 //
 //   node render.mjs                       full film -> out/decode-brand-film.mp4
 //   node render.mjs --stills 2,10.5,22.6  PNG stills -> build/stills/
@@ -92,7 +92,7 @@ try {
       '-y', '-hide_banner', '-loglevel', 'error',
       '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'png', '-i', '-',
       '-vf', 'scale=out_color_matrix=bt709:out_range=tv,format=yuv420p',
-      '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-profile:v', 'high', '-tune', 'film',
+      '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-profile:v', 'high', '-x264-params', 'aq-mode=3',
       '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
       '-movflags', '+faststart', withAudio ? silent : out,
     ], { stdio: ['pipe', 'inherit', 'inherit'] });

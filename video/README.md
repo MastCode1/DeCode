@@ -53,5 +53,5 @@ node render.mjs --no-audio       # skip the soundtrack
 ```
 
 `render(t)` in `index.html` is a pure function of time, so `render.mjs` can capture every frame
-exactly and pipe PNGs to ffmpeg (H.264, CRF 16, BT.709). There are no CSS animations or timers to
+exactly and pipe PNGs to ffmpeg (H.264, CRF 18, BT.709). There are no CSS animations or timers to
 drift.
