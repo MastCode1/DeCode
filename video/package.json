@@ -1,0 +1,14 @@
+{
+  "name": "decode-motion-intro",
+  "private": true,
+  "type": "module",
+  "description": "DeCode motion-graphics intro film, rendered from HTML with headless Chromium and ffmpeg",
+  "scripts": {
+    "render": "node render.mjs && node render.mjs --theme light",
+    "render:dark": "node render.mjs",
+    "render:light": "node render.mjs --theme light"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.0"
+  }
+}

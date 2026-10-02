@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeCode Intro</title>
+<style>
+@font-face{font-family:"Geist";src:url("fonts/geist-sans-latin-400-normal.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Geist";src:url("fonts/geist-sans-latin-500-normal.woff2") format("woff2");font-weight:500;font-display:block}
+@font-face{font-family:"Geist";src:url("fonts/geist-sans-latin-600-normal.woff2") format("woff2");font-weight:600;font-display:block}
+@font-face{font-family:"Geist";src:url("fonts/geist-sans-latin-700-normal.woff2") format("woff2");font-weight:700;font-display:block}
+@font-face{font-family:"Geist Mono";src:url("fonts/geist-mono-latin-400-normal.woff2") format("woff2");font-weight:400;font-display:block}
+@font-face{font-family:"Geist Mono";src:url("fonts/geist-mono-latin-500-normal.woff2") format("woff2");font-weight:500;font-display:block}
+
+/* DeCode tokens (from decodeai.net): near-black canvas, soft white ink, neutral greys */
+:root,:root[data-theme="dark"]{
+  --bg:#0a0a0a; --text:#f4f4f4; --text2:#cfcfcf; --muted:#8e8e8e; --faint:#3a3a3a;
+  --card:#141414; --card-border:#262626; --hover:#1f1f1f; --bubble:#303030;
+  --input:#212121; --input-border:#2f2f2f; --input-shadow:0 12px 34px rgba(0,0,0,.45);
+  --accent:#f4f4f4; --on-accent:#0d0d0d; --shadow:0 18px 50px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.4);
+  --code-bg:#0f0f0f; --line-hl:rgba(255,255,255,.06); --mark:rgba(120,170,255,.16); --mark-edge:#78aaff;
+  --ok:#4ade80; --live:#ef4444;
+  --kw:#ff7b72; --str:#a5d6ff; --num:#79c0ff; --fn:#d2a8ff; --glob:#ffa657; --com:#8b949e;
+  --aurora:.55;
+}
+:root[data-theme="light"]{
+  --bg:#ffffff; --text:#0d0d0d; --text2:#3d3d3d; --muted:#8f8f8f; --faint:#d6d6d6;
+  --card:#ffffff; --card-border:#ececec; --hover:#f4f4f4; --bubble:#f1f1f1;
+  --input:#ffffff; --input-border:#e3e3e3; --input-shadow:0 8px 26px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.05);
+  --accent:#0d0d0d; --on-accent:#ffffff; --shadow:0 12px 36px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.06);
+  --code-bg:#fbfbfb; --line-hl:rgba(0,0,0,.04); --mark:rgba(9,105,218,.10); --mark-edge:#0969da;
+  --ok:#16a34a; --live:#ef4444;
+  --kw:#cf222e; --str:#0a3069; --num:#0550ae; --fn:#8250df; --glob:#953800; --com:#6e7781;
+  --aurora:.9;
+}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden}
+body{display:flex;align-items:center;justify-content:center}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;background:var(--bg);overflow:hidden;transform-origin:0 0;
+  font-family:"Geist",ui-sans-serif,system-ui,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision}
+.scene{position:absolute;inset:0;display:none}
+.abs{position:absolute}
+.ico{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:20px;box-shadow:var(--shadow);box-sizing:border-box}
+
+/* headlines */
+.hl{position:absolute;inset:0;pointer-events:none}
+.hl-line{position:absolute;left:0;white-space:pre;will-change:transform}
+
+/* picker */
+.pk-card{position:absolute;left:680px;width:560px;overflow:hidden;border-radius:20px}
+.pk-row{position:absolute;left:8px;right:8px;height:68px;display:flex;align-items:center;gap:14px;padding:0 14px;box-sizing:border-box}
+.pk-hl{position:absolute;left:8px;right:8px;height:68px;border-radius:12px;background:var(--hover)}
+.tile{width:42px;height:42px;border-radius:12px;background:var(--hover);display:flex;align-items:center;justify-content:center;flex:none;color:var(--text)}
+.tile.brand{background:var(--accent)}
+.tile.brand img{width:30px}
+.pk-name{font-size:20px;font-weight:500;line-height:1.2}
+.pk-desc{font-size:15.5px;color:var(--muted);line-height:1.35;margin-top:2px}
+.pk-check{margin-left:auto;width:26px;height:26px}
+
+/* input */
+.input{position:absolute;left:520px;top:506px;width:880px;height:68px;border-radius:34px;background:var(--input);border:1px solid var(--input-border);
+  box-shadow:var(--input-shadow);display:flex;align-items:center;gap:12px;padding:0 12px 0 20px;box-sizing:border-box;font-size:21px;color:var(--text)}
+.ib-field{position:relative;flex:1;display:flex;align-items:center;white-space:pre;height:100%;overflow:hidden}
+.ib-ph{position:absolute;left:0;color:var(--muted)}
+.ib-caret{display:inline-block;width:2px;height:26px;background:var(--text);margin-left:1px;border-radius:1px}
+.ib-mic{color:var(--text2)}
+.ib-send{position:relative;width:44px;height:44px;flex:none}
+.ib-send>div{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.ib-send .s0{background:var(--hover);color:var(--text)}
+.ib-send .s1{background:var(--accent);color:var(--on-accent)}
+.ib-chip{display:flex;align-items:center;gap:7px;height:38px;padding:0 14px 0 10px;border-radius:19px;background:var(--mark);color:var(--mark-edge);font-size:17px;font-weight:500;flex:none}
+.ib-chip .ico{width:20px;height:20px}
+.ib-plus{color:var(--text2)}
+
+/* chat bits */
+.col{position:absolute;left:560px;width:800px}
+.bubble-row{display:flex;justify-content:flex-end}
+.bubble{background:var(--bubble);border-radius:24px;padding:14px 22px;font-size:20px;line-height:1.45;max-width:560px;color:var(--text)}
+.answer{font-size:21px;line-height:1.62;color:var(--text2)}
+.answer b{color:var(--text);font-weight:600}
+.answer ol{margin:14px 0 0;padding:0;list-style:none}
+.answer li{display:flex;gap:16px;margin:0 0 12px}
+.answer .num{flex:none;width:30px;height:30px;border-radius:50%;background:var(--hover);color:var(--text);font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;margin-top:3px}
+.w{display:inline-block;white-space:pre}
+
+/* status lines */
+.status{position:absolute;left:0;width:1920px}
+
+/* code */
+.code-card{position:absolute;left:490px;top:118px;width:940px;overflow:hidden}
+.code-head{height:56px;display:flex;align-items:center;gap:12px;padding:0 22px;border-bottom:1px solid var(--card-border);font-size:17px;color:var(--text2)}
+.code-head .lang{margin-left:auto;color:var(--muted);font-size:15px}
+.code-body{position:relative;padding:20px 0;background:var(--code-bg);font-family:"Geist Mono",ui-monospace,monospace;font-size:19px;line-height:29px}
+.cl{position:relative;height:29px;white-space:pre;padding-left:76px;padding-right:24px}
+.cl .ln{position:absolute;left:0;width:52px;text-align:right;color:var(--muted);opacity:.55}
+.code-band{position:absolute;left:0;right:0;height:29px;background:var(--line-hl)}
+.code-mark{position:absolute;left:0;right:0;background:var(--mark);border-left:3px solid var(--mark-edge)}
+.t-kw{color:var(--kw)}.t-str{color:var(--str)}.t-num{color:var(--num)}.t-fn{color:var(--fn)}.t-glob{color:var(--glob)}.t-com{color:var(--com)}
+.chips{position:absolute;display:flex;gap:12px}
+.chip{display:flex;align-items:center;gap:8px;height:44px;padding:0 18px 0 14px;border-radius:22px;border:1px solid var(--card-border);background:var(--card);font-size:17px;color:var(--text2);box-sizing:border-box}
+.chip .ico{width:20px;height:20px}
+.chip.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+
+/* research */
+.src{display:flex;align-items:center;gap:10px;height:44px;padding:0 16px 0 8px;border-radius:22px;background:var(--hover);font-size:16px;color:var(--text2)}
+.fav{width:28px;height:28px;border-radius:50%;background:var(--card);border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--text)}
+.cite{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:24px;border-radius:12px;background:var(--hover);color:var(--muted);font-size:14px;font-weight:600;margin-left:6px;vertical-align:2px;padding:0 6px;box-sizing:border-box}
+.answer ul{margin:12px 0 0;padding:0;list-style:none}
+.answer ul li{display:flex;gap:14px;margin:0 0 10px}
+.dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--text);margin-top:14px}
+
+/* voice */
+.live-pill{position:absolute;left:50%;top:206px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;height:44px;padding:0 20px;border-radius:22px;background:var(--hover);font-size:18px;font-weight:500}
+.live-dot{width:9px;height:9px;border-radius:50%;background:var(--live)}
+.caption{position:absolute;left:360px;width:1200px;text-align:center;font-size:30px;line-height:1.4;font-weight:500}
+.who{position:absolute;left:0;width:1920px;text-align:center;font-size:17px;color:var(--muted);letter-spacing:.02em}
+.vbtn{position:absolute;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--hover);color:var(--text)}
+.vbtn.end{background:var(--live);color:#fff}
+
+/* connectors */
+.hub{position:absolute;left:896px;top:476px;width:128px;height:128px;border-radius:34px;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.hub img{width:92px}
+.cchip{position:absolute;display:flex;align-items:center;gap:12px;height:58px;padding:0 22px 0 10px;border-radius:29px;background:var(--card);border:1px solid var(--card-border);box-shadow:var(--shadow);font-size:19px;font-weight:500;white-space:nowrap;box-sizing:border-box}
+.cchip .tile{width:38px;height:38px;border-radius:19px}
+.cchip .ico{width:21px;height:21px}
+.perm{position:absolute;left:630px;width:660px;padding:30px 32px 26px}
+.perm-icons{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.perm-dots{display:flex;gap:6px;margin:0 6px}
+.perm-dots i{width:6px;height:6px;border-radius:50%;background:var(--muted);display:block}
+.perm-title{font-size:25px;font-weight:600;line-height:1.3}
+.perm-desc{font-size:18px;color:var(--muted);line-height:1.5;margin-top:10px}
+.perm-btns{display:flex;justify-content:flex-end;gap:12px;margin-top:26px}
+.btn{height:48px;padding:0 24px;border-radius:24px;display:flex;align-items:center;font-size:18px;font-weight:500}
+.btn.ghost{border:1px solid var(--card-border);color:var(--text2)}
+.btn.solid{background:var(--accent);color:var(--on-accent)}
+.res{position:absolute;top:404px;width:430px;height:262px;padding:26px 28px;box-sizing:border-box}
+.res-top{display:flex;align-items:center;gap:12px;font-size:16px;color:var(--muted)}
+.res-top .tile{width:36px;height:36px;border-radius:10px}
+.res-top .ico{width:20px;height:20px}
+.res-title{font-size:24px;font-weight:600;margin-top:18px}
+.res-meta{font-size:18px;color:var(--text2);margin-top:8px;line-height:1.45}
+.res-foot{position:absolute;left:28px;bottom:24px;display:flex;align-items:center;gap:8px;font-size:17px;font-weight:500;color:var(--ok)}
+.res-foot .ico{width:22px;height:22px;stroke-width:2.2}
+.avs{display:flex;margin-top:12px}
+.av{width:30px;height:30px;border-radius:50%;border:2px solid var(--card);margin-right:-8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff}
+.cursor{position:absolute;left:0;top:0;width:30px;height:30px;pointer-events:none}
+
+/* studio */
+.aurora{position:absolute;border-radius:50%;filter:blur(90px)}
+.studio{position:absolute;left:250px;top:150px;width:1420px;height:780px;overflow:hidden;border-radius:18px}
+.st-bar{position:absolute;left:0;right:0;top:0;height:50px;display:flex;align-items:center;gap:18px;padding:0 20px;border-bottom:1px solid var(--card-border);font-size:15px;color:var(--muted);box-sizing:border-box}
+.st-bar .lights{display:flex;gap:8px}
+.st-bar .lights i{display:block;width:12px;height:12px;border-radius:50%;background:var(--faint)}
+.st-bar .title{position:absolute;left:0;right:0;text-align:center;color:var(--text2);font-weight:500;pointer-events:none}
+.st-view{position:absolute;left:0;top:50px;width:900px;height:730px;overflow:hidden;background:linear-gradient(180deg,#7cc4ff 0%,#bfe4ff 55%,#e9f6ff 100%)}
+.st-panel{position:absolute;left:900px;top:50px;width:520px;height:730px;border-left:1px solid var(--card-border);box-sizing:border-box}
+.sp-head{height:64px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid var(--card-border);font-size:18px;font-weight:500}
+.sp-head .tile{width:34px;height:34px;border-radius:10px}
+.sp-head .tile img{width:24px}
+.sp-msgs{position:absolute;left:20px;right:20px;top:88px}
+.sp-msgs .bubble{font-size:16px;padding:10px 16px;border-radius:18px;max-width:380px}
+.sp-text{font-size:16px;line-height:1.55;color:var(--text2);margin-top:18px}
+.sp-code{margin-top:12px;background:var(--code-bg);border:1px solid var(--card-border);border-radius:12px;padding:12px 0;font-family:"Geist Mono",ui-monospace,monospace;font-size:13px;line-height:21px}
+.sp-code .cl{height:21px;padding-left:14px;padding-right:10px}
+.sp-think{font-size:16px;margin-top:18px}
+.sp-input{position:absolute;left:20px;right:20px;bottom:20px;height:50px;border-radius:25px;border:1px solid var(--input-border);background:var(--input);display:flex;align-items:center;padding:0 18px;font-size:16px;color:var(--muted)}
+
+/* finale */
+#meta{position:absolute;left:0;top:0;width:1920px;height:1080px}
+.wordmark{position:absolute;font-size:128px;font-weight:600;letter-spacing:-.045em;line-height:1;white-space:pre}
+.soon{position:absolute;left:0;width:1920px;display:flex;justify-content:center}
+.soon span{display:flex;align-items:center;gap:12px;height:56px;padding:0 26px;border-radius:28px;border:1px solid var(--card-border);font-size:23px;font-weight:500;color:var(--text2)}
+.soon i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:block}
+.url{position:absolute;left:0;width:1920px;text-align:center;font-size:20px;color:var(--muted);letter-spacing:.01em}
+
+/* preview controls (not rendered) */
+#ui{position:fixed;left:0;right:0;bottom:0;height:44px;display:flex;align-items:center;gap:12px;padding:0 14px;background:rgba(20,20,20,.85);color:#ddd;font:13px/1 ui-monospace,monospace;z-index:9}
+#ui input{flex:1}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+'use strict';
+const P = new URLSearchParams(location.search);
+const THEME = P.get('theme') === 'light' ? 'light' : 'dark';
+document.documentElement.dataset.theme = THEME;
+const RENDER = P.has('render');
+const stage = document.getElementById('stage');
+const INK = THEME === 'dark' ? { text: [244, 244, 244], onAccent: [13, 13, 13] } : { text: [13, 13, 13], onAccent: [255, 255, 255] };
+
+/* ---------- math ---------- */
+const clamp = (x, a = 0, b = 1) => x < a ? a : x > b ? b : x;
+const lerp = (a, b, t) => a + (b - a) * t;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const E = {
+  out2: x => 1 - (1 - x) * (1 - x),
+  out3: x => 1 - Math.pow(1 - x, 3),
+  out5: x => 1 - Math.pow(1 - x, 5),
+  in2: x => x * x,
+  io2: x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2,
+  io3: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  outBack: x => { const c1 = 1.3, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+};
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+/* ---------- dom helpers ---------- */
+function html(parent, markup) {
+  const t = document.createElement('template');
+  t.innerHTML = markup.trim();
+  const el = t.content.firstElementChild;
+  parent.appendChild(el);
+  return el;
+}
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+function fx(el, { o = 1, x = 0, y = 0, s = 1, blur = 0 } = {}) {
+  const st = el.style;
+  st.opacity = o;
+  st.visibility = o < .002 ? 'hidden' : 'visible';
+  st.transform = `translate(${x}px,${y}px) scale(${s})`;
+  st.filter = blur > .05 ? `blur(${blur}px)` : 'none';
+}
+// standard in/out envelope used by every card-like element
+function card(el, t, tin, tout, { din = .55, dout = .45, dy = 18, dyOut = -12, s0 = .975, blur = 8, x = 0 } = {}) {
+  const a = E.out3(prog(t, tin, tin + din));
+  const b = tout == null ? 0 : E.io2(prog(t, tout, tout + dout));
+  fx(el, { o: a * (1 - b), x, y: (1 - a) * dy + b * dyOut, s: lerp(s0, 1, a) - b * .015, blur: (1 - a) * blur + b * blur * .7 });
+  return a * (1 - b);
+}
+function offsetIn(el, root) {
+  let x = 0, y = 0, n = el;
+  while (n && n !== root) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+}
+
+/* ---------- icons ---------- */
+const I = {
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/>',
+  wave: '<path d="M4 10v4M8 6.5v11M12 9v6M16 5v14M20 10v4"/>',
+  up: '<path d="M12 19V5M6 11l6-6 6 6"/>',
+  chat: '<path d="M20.5 11.5a8.5 8.5 0 0 1-12.3 7.6L3.5 20.5l1.4-4.5A8.5 8.5 0 1 1 20.5 11.5z"/>',
+  code: '<path d="M8.5 7 3.5 12l5 5M15.5 7l5 5-5 5"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+  link: '<path d="M10 14a4.2 4.2 0 0 0 6 0l3-3a4.2 4.2 0 0 0-6-6l-1 1M14 10a4.2 4.2 0 0 0-6 0l-3 3a4.2 4.2 0 0 0 6 6l1-1"/>',
+  cube: '<path d="M12 2.8 20.5 7.5v9L12 21.2 3.5 16.5v-9z"/><path d="M3.5 7.5 12 12.2l8.5-4.7M12 12.2v9"/>',
+  check: '<path d="M5 12.5 9.5 17 19 7.5"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+  cal: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  drive: '<path d="M9 4h6l6.5 11-3 5h-13l-3-5z"/><path d="M9 4l6.5 11h6M2.5 15h13"/>',
+  grid: '<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/>',
+  branch: '<circle cx="6.5" cy="5.5" r="2.2"/><circle cx="6.5" cy="18.5" r="2.2"/><circle cx="17.5" cy="7.5" r="2.2"/><path d="M6.5 7.7v8.6M17.5 9.7c0 4.5-6 3.5-10 6.6"/>',
+  disc: '<path d="M5.5 5h13A2.5 2.5 0 0 1 21 7.5v8a2.5 2.5 0 0 1-2.5 2.5H13l-4.5 3v-3h-3A2.5 2.5 0 0 1 3 15.5v-8A2.5 2.5 0 0 1 5.5 5z"/><path d="M9 11.5h.01M15 11.5h.01"/>',
+  play: '<rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="m10 9 5 3-5 3z"/>',
+  pen: '<path d="M4 20l1.2-4.6L16 4.6a2.1 2.1 0 0 1 3 3L8.2 18.4z"/><path d="M14 6.6l3 3"/>',
+  file: '<path d="M6.5 3h8l4 4v14h-12z"/><path d="M14.5 3v4h4"/>',
+  copy: '<rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5"/>',
+  spark: '<path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9-1.9 5.1-1.9-5.1-5.1-1.9 5.1-1.9z"/>',
+  bug: '<rect x="7.5" y="7" width="9" height="13" rx="4.5"/><path d="M12 11v9M3.5 13.5h4M16.5 13.5h4M4.5 8.5l3 1.5M19.5 8.5l-3 1.5M4.5 19l3-1.5M19.5 19l-3-1.5M9.5 7a2.5 2.5 0 0 1 5 0"/>',
+  wand: '<path d="M4 20 15 9M15 3v2.5M15 12.5V15M9 9h2.5M18.5 9H21M17.5 6.5l1.8-1.8M17.5 11.5l1.8 1.8"/>',
+  x: '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+  start: '<path d="M7 5.5l12 6.5-12 6.5z"/>',
+};
+const ico = (n, extra = '') => `<svg class="ico" viewBox="0 0 24 24" ${extra}>${I[n]}</svg>`;
+
+/* ---------- DeCode logo, traced from the decodeai.net app icon ---------- */
+// three glyphs  <  |  >  each built from three circles blended with a smooth union
+const LOGO = [
+  { k: 20, c: [[142, 183, 52], [80, 246, 34], [142, 310, 52.5]] },
+  { k: 20, c: [[249.5, 161, 52], [249.5, 245.5, 30.5], [249.5, 331, 52.5]] },
+  { k: 20, c: [[357, 183, 52], [419, 246, 34], [357, 310, 52.5]] },
+];
+const LOGO_CX = 249.5, LOGO_CY = 246;
+function logoGroups(cx, cy, s) {
+  return LOGO.map(g => ({ k: g.k * s, c: g.c.map(([x, y, r]) => [cx + (x - LOGO_CX) * s, cy + (y - LOGO_CY) * s, r * s]) }));
+}
+// signed-distance metaball rasteriser (crisp at any size, animatable)
+function rasterBlobs(ctx, groups, rgb, alpha = 1, prev = null) {
+  if (prev) ctx.clearRect(prev[0], prev[1], prev[2], prev[3]);
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  for (const g of groups) for (const [x, y, r] of g.c) {
+    const m = r + g.k + 3;
+    x0 = Math.min(x0, x - m); y0 = Math.min(y0, y - m); x1 = Math.max(x1, x + m); y1 = Math.max(y1, y + m);
+  }
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0));
+  x1 = Math.min(W, Math.ceil(x1)); y1 = Math.min(H, Math.ceil(y1));
+  const w = x1 - x0, h = y1 - y0;
+  if (w <= 0 || h <= 0 || alpha <= 0) return null;
+  const img = ctx.createImageData(w, h), d = img.data;
+  const flat = groups.map(g => ({ k: g.k, c: g.c.map(v => v.slice()) }));
+  for (let j = 0; j < h; j++) {
+    const py = y0 + j + .5;
+    for (let i = 0; i < w; i++) {
+      const px = x0 + i + .5;
+      let a = 0;
+      for (let gi = 0; gi < flat.length; gi++) {
+        const g = flat[gi], k = g.k;
+        let dd = 1e9;
+        for (let ci = 0; ci < g.c.length; ci++) {
+          const c = g.c[ci], dx = px - c[0], dy = py - c[1];
+          const di = Math.sqrt(dx * dx + dy * dy) - c[2];
+          if (k > .01) {
+            const hh = Math.max(k - Math.abs(dd - di), 0) / k;
+            dd = Math.min(dd, di) - hh * hh * k * .25;
+          } else dd = Math.min(dd, di);
+        }
+        const ai = .5 - dd;
+        if (ai > a) a = ai >= 1 ? 1 : ai;
+      }
+      if (a > 0) {
+        const o = (j * w + i) * 4;
+        d[o] = rgb[0]; d[o + 1] = rgb[1]; d[o + 2] = rgb[2]; d[o + 3] = a * 255 * alpha;
+      }
+    }
+  }
+  ctx.putImageData(img, x0, y0);
+  return [x0, y0, w, h];
+}
+function logoDataURL(rgb, height = 240) {
+  const s = height / 280, c = document.createElement('canvas');
+  c.width = Math.ceil(420 * s); c.height = Math.ceil(290 * s);
+  rasterBlobs(c.getContext('2d'), logoGroups(c.width / 2, c.height / 2, s), rgb);
+  return c.toDataURL();
+}
+const LOGO_ON_ACCENT = logoDataURL(INK.onAccent);
+const brandTile = (cls = '') => `<div class="tile brand ${cls}"><img src="${LOGO_ON_ACCENT}" alt=""></div>`;
+
+/* ---------- timeline ---------- */
+let cursor = 0;
+const slot = (dur, overlap = 0) => { const s = Math.max(0, cursor - overlap); cursor = s + dur; return s; };
+const T = {}, D = {};
+const seq = (name, dur, overlap = 0) => { T[name] = slot(dur, overlap); D[name] = dur; };
+seq('picker', 5.15);
+seq('h1', 2.9, .2);
+seq('h2', 3.2, .12);
+seq('h3', 2.6, .12);
+seq('ask', 3.6, .2);
+seq('think', 4.2, .25);
+seq('plan', 4.0, .2);
+seq('h4', 2.55, .15);
+seq('code', 8.0, .2);
+seq('h5', 2.4, .2);
+seq('research', 6.6, .2);
+seq('h6', 2.65, .2);
+seq('voice', 5.7, .2);
+seq('h7', 2.65, .2);
+seq('connect', 8.6, .2);
+seq('h8', 2.7, .2);
+seq('studio', 6.9, .2);
+seq('h9', 3.0, .2);
+seq('final', 5.9, .1);
+const DURATION = cursor;
+const CUES = [];
+const cue = (t, type, v = 1) => CUES.push({ t: +t.toFixed(4), type, v });
+
+const scenes = [];
+function addScene(start, dur, build) {
+  const el = html(stage, '<div class="scene"></div>');
+  const s = { start, end: start + dur, el, update: () => {}, measure: () => {} };
+  Object.assign(s, build(el, s) || {});
+  scenes.push(s);
+  return s;
+}
+
+/* ---------- headline: typed in with a soft leading edge, wiped out left to right ---------- */
+class Headline {
+  constructor(parent, lines, o = {}) {
+    this.o = Object.assign({ size: 66, weight: 500, cy: 540, lh: 1.24, cps: 28, soft: 6, gap: .1, track: '-0.028em', color: 'var(--text)', shimmer: false, fixed: false }, o);
+    this.el = html(parent, '<div class="hl"></div>');
+    const n = lines.length, lhPx = this.o.size * this.o.lh;
+    this.lines = lines.map((text, li) => {
+      const ln = html(this.el, '<div class="hl-line"></div>');
+      ln.style.cssText = `font-size:${this.o.size}px;font-weight:${this.o.weight};letter-spacing:${this.o.track};color:${this.o.color};top:${this.o.cy - n * lhPx / 2 + li * lhPx}px;height:${lhPx}px;line-height:${lhPx}px`;
+      const chars = [...text].map(ch => { const s = document.createElement('span'); s.textContent = ch; ln.appendChild(s); return s; });
+      return { el: ln, chars, text };
+    });
+  }
+  measure() {
+    for (const L of this.lines) {
+      L.edges = [0];
+      for (const c of L.chars) L.edges.push(c.offsetLeft + c.offsetWidth);
+      L.w = L.edges[L.edges.length - 1];
+      L.mid = L.chars.map(c => c.offsetLeft + c.offsetWidth / 2);
+    }
+  }
+  typeDur() { return this.lines.reduce((a, L) => a + L.chars.length / this.o.cps, 0) + this.o.gap * (this.lines.length - 1); }
+  render(t, tIn, tOut, dOut = .5) {
+    const o = this.o;
+    let start = tIn;
+    for (const L of this.lines) {
+      const len = L.chars.length;
+      const n = (t - start) * o.cps;
+      const m = tOut == null ? -1e9 : (t - tOut) / dOut * (len + o.soft);
+      const nn = clamp(n, 0, len), i = Math.floor(nn);
+      const w = i >= len || o.fixed ? L.w : lerp(L.edges[i], L.edges[i + 1], nn - i);
+      L.el.style.transform = `translateX(${(1920 - w) / 2}px)`;
+      let vis = false;
+      for (let j = 0; j < len; j++) {
+        let a = E.out2(clamp((n - j) / o.soft));
+        if (m > -1e8) a *= 1 - E.in2(clamp((m - j) / o.soft));
+        L.chars[j].style.opacity = a;
+        if (a > 0) vis = true;
+        if (o.shimmer) {
+          const hx = ((t * .75) % 1.5 - .25) * Math.max(L.w, 400);
+          const g = Math.exp(-Math.pow((L.mid[j] - hx) / 110, 2));
+          L.chars[j].style.color = `color-mix(in srgb, var(--text) ${Math.round(18 + g * 82)}%, var(--muted))`;
+        }
+      }
+      L.el.style.visibility = vis ? 'visible' : 'hidden';
+      start += len / o.cps + o.gap;
+    }
+  }
+}
+function headlineScene(start, dur, lines, o = {}) {
+  return addScene(start, dur, el => {
+    const h = new Headline(el, lines, o);
+    cue(start + .02, 'swoosh', .6);
+    return { measure: () => h.measure(), update: t => h.render(t, .05, dur - .52, .5) };
+  });
+}
+
+/* ---------- prompt box ---------- */
+class InputBar {
+  constructor(parent, prompt, { chip = null, top = 506 } = {}) {
+    this.prompt = prompt;
+    this.el = html(parent, `<div class="input" style="top:${top}px">
+      <span class="ib-plus">${ico('plus')}</span>
+      ${chip ? `<div class="ib-chip">${ico('globe')}${chip}</div>` : ''}
+      <div class="ib-field"><span class="ib-ph">How can I help you?</span><span class="ib-text"></span><span class="ib-caret"></span></div>
+      <span class="ib-mic">${ico('mic')}</span>
+      <div class="ib-send"><div class="s0">${ico('wave')}</div><div class="s1">${ico('up', 'style="stroke-width:2.2"')}</div></div>
+    </div>`);
+    this.text = $('.ib-text', this.el); this.ph = $('.ib-ph', this.el); this.caret = $('.ib-caret', this.el);
+    this.s1 = $('.s1', this.el); this.s0 = $('.s0', this.el); this.send = $('.ib-send', this.el);
+  }
+  // local times; abs = scene start (for audio cues)
+  plan(tin, tType, cps, tSend, tout, abs) {
+    Object.assign(this, { tin, tType, tSend, tout });
+    this.keys = [];
+    let tt = tType;
+    for (let i = 0; i < this.prompt.length; i++) {
+      this.keys.push(tt);
+      cue(abs + tt, 'key', .55 + .45 * rnd(i * 7 + 1));
+      const ch = this.prompt[i];
+      let dt = (1 / cps) * (.55 + .9 * rnd(i + this.prompt.length));
+      if (ch === ' ') dt *= 1.2;
+      if (',.?!'.includes(ch)) dt *= 2.4;
+      tt += dt;
+    }
+    this.typeEnd = tt;
+    if (tt > tSend - .1) console.warn(`typing overruns send: "${this.prompt}" ends ${tt.toFixed(2)} > ${tSend}`);
+    cue(abs + tSend, 'send');
+    return this;
+  }
+  render(t) {
+    card(this.el, t, this.tin, this.tout, { din: .5, dout: .42, dy: 16, dyOut: -10, blur: 6 });
+    let k = 0;
+    while (k < this.keys.length && this.keys[k] <= t) k++;
+    this.text.textContent = this.prompt.slice(0, k);
+    this.ph.style.opacity = k ? 0 : 1;
+    const typing = t >= this.tType - .05 && t < this.typeEnd + .35;
+    const blink = Math.floor((t - this.tin) * 2.2) % 2 === 0;
+    this.caret.style.opacity = t < this.tin + .25 || t > this.tSend ? 0 : (typing || blink ? 1 : 0);
+    const s = E.out3(prog(t, this.tType, this.tType + .22));
+    this.s1.style.opacity = s; this.s0.style.opacity = 1 - s;
+    const pp = prog(t, this.tSend, this.tSend + .3);
+    this.send.style.transform = `scale(${1 - .14 * Math.sin(pp * Math.PI)})`;
+  }
+}
+
+/* ---------- streamed text: every word (or .atom element) fades in on a schedule ---------- */
+function streamify(root) {
+  const items = [];
+  (function walk(n) {
+    for (const c of [...n.childNodes]) {
+      if (c.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        for (const p of c.textContent.split(/(\s+)/)) {
+          if (!p) continue;
+          if (/^\s+$/.test(p)) frag.appendChild(document.createTextNode(p));
+          else { const s = document.createElement('span'); s.className = 'w'; s.textContent = p; frag.appendChild(s); items.push(s); }
+        }
+        c.parentNode.replaceChild(frag, c);
+      } else if (c.nodeType === 1) {
+        if (c.classList.contains('atom')) items.push(c); else walk(c);
+      }
+    }
+  })(root);
+  return items;
+}
+function stream(items, t, t0, rate, fade = .22) {
+  for (let i = 0; i < items.length; i++) {
+    const a = E.out2(clamp((t - (t0 + i / rate)) / fade));
+    items[i].style.opacity = a;
+    items[i].style.transform = `translateY(${(1 - a) * 5}px)`;
+  }
+  return t0 + items.length / rate;
+}
+
+/* ---------- Luau highlighter ---------- */
+const KW = new Set('local function if then return end for in do not and or nil true false else elseif while'.split(' '));
+const GLOB = new Set('game workspace Enum Vector3 TweenInfo tonumber'.split(' '));
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function hl(line) {
+  const re = /(--.*$)|("(?:[^"\\]|\\.)*")|(\b\d+(?:\.\d+)?\b)|([A-Za-z_][A-Za-z0-9_]*)|([\s\S])/g;
+  let out = '', m;
+  while ((m = re.exec(line))) {
+    if (m[1]) out += `<span class="t-com">${esc(m[1])}</span>`;
+    else if (m[2]) out += `<span class="t-str">${esc(m[2])}</span>`;
+    else if (m[3]) out += `<span class="t-num">${m[3]}</span>`;
+    else if (m[4]) {
+      const id = m[4], next = line[re.lastIndex];
+      if (KW.has(id)) out += `<span class="t-kw">${id}</span>`;
+      else if (GLOB.has(id)) out += `<span class="t-glob">${id}</span>`;
+      else if (next === '(') out += `<span class="t-fn">${id}</span>`;
+      else out += id;
+    } else out += esc(m[5]);
+  }
+  return out;
+}
+
+/* ================================================================
+   SCENE 0 — many separate tools collapse into one: DeCode
+   ================================================================ */
+addScene(T.picker, D.picker, el => {
+  const rows = [
+    ['chat', 'Chat', 'Answers everyday questions'],
+    ['code', 'Code', 'Writes and explains code'],
+    ['globe', 'Research', 'Searches the web'],
+    ['wave', 'Real-Time', 'Talks with you live'],
+    ['link', 'Connectors', 'Works with your apps'],
+    ['cube', 'Roblox Studio', 'Helps you build games'],
+  ];
+  const c = html(el, `<div class="pk-card card"><div class="pk-hl"></div>
+    ${rows.map(([i, n, d]) => `<div class="pk-row"><div class="tile">${ico(i)}</div><div><div class="pk-name">${n}</div><div class="pk-desc">${d}</div></div></div>`).join('')}
+    <div class="pk-row pk-final">${brandTile()}<div><div class="pk-name">DeCode</div><div class="pk-desc">One AI workspace for all of it</div></div>
+      <svg class="ico pk-check" viewBox="0 0 24 24" style="stroke-width:2.2"><path d="M5 12.5 9.5 17 19 7.5" pathLength="1" stroke-dasharray="1" /></svg></div></div>`);
+  const rEls = $$('.pk-row', c), fin = rEls.pop(), hlb = $('.pk-hl', c), chk = $('.pk-check path', c);
+  const R0 = T.picker;
+  rows.forEach((_, i) => i && cue(R0 + .95 + i * .07, 'pop', .35));
+  cue(R0 + 1.9, 'tick', .25); cue(R0 + 3.2, 'collapse', .7); cue(R0 + 4.15, 'tick', .8);
+  return {
+    update(t) {
+      const e = E.io3(prog(t, .85, 1.65)), col = E.io3(prog(t, 3.2, 3.95)), open = e * (1 - col);
+      const h = 84 + 6 * 68 * open - 68 * open;
+      c.style.height = h + 'px';
+      c.style.top = (540 - h / 2) + 'px';
+      card(c, t, .15, 4.72, { din: .6, dout: .38, dy: 10, dyOut: -8, s0: .96, blur: 10 });
+      rEls.forEach((r, i) => {
+        let o;
+        if (i === 0) o = 1 - E.out2(prog(t, 3.75, 4.1));
+        else o = E.out3(prog(t, .95 + i * .07, 1.4 + i * .07)) * (1 - E.out2(prog(t, 3.15 + (5 - i) * .035, 3.6 + (5 - i) * .035)));
+        r.style.opacity = o;
+        r.style.transform = `translateY(${8 + i * 68}px)`;
+      });
+      const fo = E.out3(prog(t, 3.8, 4.25));
+      fin.style.opacity = fo;
+      fin.style.transform = `translateY(${8 + (1 - fo) * 10}px)`;
+      chk.style.strokeDashoffset = 1 - E.out3(prog(t, 4.1, 4.5));
+      const ho = prog(t, 1.75, 1.95) * (1 - prog(t, 3.0, 3.2));
+      hlb.style.opacity = ho;
+      hlb.style.transform = `translateY(${8 + E.io3(prog(t, 1.9, 3.05)) * 5 * 68}px)`;
+    },
+  };
+});
+
+/* ================================================================
+   HEADLINES that carry the story
+   ================================================================ */
+headlineScene(T.h1, D.h1, ['Introducing DeCode'], { cps: 17, size: 72 });
+headlineScene(T.h2, D.h2, ['Chat, code, research, and create', 'in one AI workspace'], { cps: 30 });
+headlineScene(T.h3, D.h3, ['Every big idea starts with a question'], { cps: 31 });
+
+/* ================================================================
+   SCENE — the question
+   ================================================================ */
+addScene(T.ask, D.ask, el => {
+  const ib = new InputBar(el, 'I want to make my first Roblox game. Where do I start?').plan(0, .55, 28, 2.95, 3.12, T.ask);
+  return { update: t => ib.render(t) };
+});
+
+/* ================================================================
+   SCENE — DeCode thinks it through
+   ================================================================ */
+addScene(T.think, D.think, el => {
+  const words = ['Thinking', 'Breaking down your idea', 'Planning the first steps'];
+  const hs = words.map(w => new Headline(el, [w], { size: 54, cps: 34, soft: 7, shimmer: true, fixed: true, color: 'var(--muted)' }));
+  const sched = [[.05, 1.25], [1.45, 2.6], [2.8, 3.72]];
+  return {
+    measure: () => hs.forEach(h => h.measure()),
+    update: t => hs.forEach((h, i) => h.render(t, sched[i][0], sched[i][1], .45)),
+  };
+});
+
+/* ================================================================
+   SCENE — the plan
+   ================================================================ */
+addScene(T.plan, D.plan, el => {
+  const col = html(el, `<div class="col" style="top:356px">
+    <div class="bubble-row"><div class="bubble">I want to make my first Roblox game. Where do I start?</div></div>
+    <div class="answer" style="margin-top:34px">
+      Great first project. Here’s a simple plan:
+      <ol>
+        <li><span class="num atom">1</span><span><b>Pick a style.</b> An obby is perfect for a first game: simple rules, endless levels.</span></li>
+        <li><span class="num atom">2</span><span><b>Build the first level.</b> Platforms, gaps, and a finish line.</span></li>
+        <li><span class="num atom">3</span><span><b>Write the core scripts.</b> Checkpoints, a timer, and a leaderboard.</span></li>
+      </ol>
+    </div></div>`);
+  const bub = $('.bubble-row', col), items = streamify($('.answer', col));
+  return {
+    update(t) {
+      card(bub, t, 0, null, { din: .45, dy: 14, blur: 6 });
+      stream(items, t, .4, 21);
+      card(col, t, -1, 3.5, { dout: .5, dyOut: -16 });
+    },
+  };
+});
+
+headlineScene(T.h4, D.h4, ['Then DeCode helps you write the code'], { cps: 31 });
+
+/* ================================================================
+   SCENE — code
+   ================================================================ */
+const CODE = `local Players = game:GetService("Players")
+local checkpoints = workspace:WaitForChild("Checkpoints")
+
+local function onTouched(part, hit)
+    local player = Players:GetPlayerFromCharacter(hit.Parent)
+    if not player then return end
+
+    local stage = player.leaderstats.Stage
+    local number = tonumber(part.Name)
+    if number and number == stage.Value + 1 then
+        stage.Value = number
+    end
+end
+
+for _, part in checkpoints:GetChildren() do
+    part.Touched:Connect(function(hit)
+        onTouched(part, hit)
+    end)
+end`.split('\n');
+addScene(T.code, D.code, el => {
+  const ib = new InputBar(el, 'Write a checkpoint script for my obby').plan(0, .5, 30, 1.95, 2.1, T.code);
+  const cc = html(el, `<div class="code-card card">
+    <div class="code-head">${ico('file', 'style="width:20px;height:20px"')}<span>checkpoints.lua</span><span class="lang">Luau</span>${ico('copy', 'style="width:20px;height:20px;color:var(--muted)"')}</div>
+    <div class="code-body"><div class="code-mark"></div><div class="code-band"></div>
+      ${CODE.map((l, i) => `<div class="cl"><span class="ln">${i + 1}</span>${hl(l) || ' '}</div>`).join('')}
+    </div></div>`);
+  const lines = $$('.cl', cc), band = $('.code-band', cc), mark = $('.code-mark', cc);
+  const chips = html(el, `<div class="chips" style="left:490px;top:812px">
+    <div class="chip">${ico('spark')}Explain</div><div class="chip">${ico('bug')}Debug</div><div class="chip">${ico('wand')}Improve</div></div>`);
+  const chipEls = $$('.chip', chips);
+  const expl = html(el, `<div class="answer abs" style="left:494px;top:878px;width:930px;font-size:20px">Each checkpoint only counts if it’s the very next stage, so players can’t skip ahead.</div>`);
+  const ex = streamify(expl);
+  const L0 = 2.6, LR = 8.4;
+  CODE.forEach((l, i) => l.trim() && cue(T.code + L0 + i / LR, 'key', .3));
+  cue(T.code + 5.55, 'click');
+  return {
+    update(t) {
+      ib.render(t);
+      const ca = card(cc, t, 2.25, 7.4, { din: .55, dy: 22, dout: .55, dyOut: -16 });
+      if (ca > 0) {
+        const n = (t - L0) * LR;
+        lines.forEach((l, i) => {
+          const a = E.out3(clamp((n - i) / 2.2));
+          l.style.opacity = a;
+          l.style.transform = `translateX(${(1 - a) * 10}px)`;
+        });
+        const cur = clamp(n - 1, 0, CODE.length - 1);
+        band.style.top = (20 + cur * 29) + 'px';
+        band.style.opacity = prog(t, L0, L0 + .2) * (1 - prog(t, L0 + CODE.length / LR + .2, L0 + CODE.length / LR + .5));
+        const mk = E.out3(prog(t, 5.75, 6.15));
+        mark.style.top = (20 + 9 * 29) + 'px';
+        mark.style.height = (3 * 29) + 'px';
+        mark.style.opacity = mk;
+        mark.style.transform = `scaleX(${lerp(.97, 1, mk)})`;
+        mark.style.transformOrigin = 'left';
+      }
+      chipEls.forEach((c, i) => card(c, t, 5.0 + i * .08, 7.4, { din: .4, dy: 10, blur: 4, dout: .5 }));
+      chipEls[0].classList.toggle('on', t >= 5.55);
+      chipEls[0].style.transform += ` scale(${1 - .06 * Math.sin(prog(t, 5.55, 5.8) * Math.PI)})`;
+      stream(ex, t, 5.8, 22);
+      card(expl, t, -1, 7.4, { dout: .55, dyOut: -16 });
+    },
+  };
+});
+
+headlineScene(T.h5, D.h5, ['Finds answers across the web'], { cps: 30 });
+
+/* ================================================================
+   SCENE — research
+   ================================================================ */
+addScene(T.research, D.research, el => {
+  const ib = new InputBar(el, 'What makes an obby fun to replay?', { chip: 'Search' }).plan(0, .5, 30, 1.8, 1.95, T.research);
+  const col = html(el, `<div class="col" style="top:292px">
+    <div class="bubble-row"><div class="bubble">What makes an obby fun to replay?</div></div>
+    <div class="abs st1" style="top:104px;left:0;display:flex;align-items:center;gap:10px;font-size:20px;color:var(--muted)">${ico('globe', 'style="width:22px;height:22px"')}<span class="stA">Searching the web</span></div>
+    <div class="abs st2" style="top:104px;left:0;display:flex;align-items:center;gap:10px;font-size:20px;color:var(--muted)">${ico('check', 'style="width:22px;height:22px"')}<span>Read 3 sources</span></div>
+    <div class="abs srcs" style="top:150px;left:0;display:flex;gap:10px">
+      <div class="src"><span class="fav">C</span>create.roblox.com</div>
+      <div class="src"><span class="fav">D</span>devforum.roblox.com</div>
+      <div class="src"><span class="fav">G</span>gamedeveloper.com</div>
+    </div>
+    <div class="answer abs" style="top:236px;left:0;width:800px">
+      Players come back to obbies that feel fair, fast, and rewarding:
+      <ul>
+        <li><span class="dot atom"></span><span>Short stages with a checkpoint after each one<span class="cite atom">1</span></span></li>
+        <li><span class="dot atom"></span><span>A visible timer, so every run can beat the last<span class="cite atom">2</span></span></li>
+        <li><span class="dot atom"></span><span>Difficulty that ramps up slowly, then spikes at the end<span class="cite atom">3</span></span></li>
+      </ul>
+    </div></div>`);
+  const bub = $('.bubble-row', col), st1 = $('.st1', col), st2 = $('.st2', col), stA = $('.stA', col);
+  const srcs = $$('.src', col), items = streamify($('.answer', col));
+  srcs.forEach((_, i) => cue(T.research + 2.5 + i * .25, 'pop', .5));
+  return {
+    update(t) {
+      ib.render(t);
+      card(bub, t, 2.05, null, { din: .45, dy: 14, blur: 6 });
+      card(st1, t, 2.25, 3.2, { din: .4, dy: 8, dout: .3, dyOut: -6, blur: 4 });
+      card(st2, t, 3.3, null, { din: .35, dy: 8, blur: 4 });
+      const g = ((t * .75) % 1.4 - .2) * 260;
+      stA.style.backgroundImage = `linear-gradient(90deg, var(--muted) ${g - 70}px, var(--text) ${g}px, var(--muted) ${g + 70}px)`;
+      stA.style.webkitBackgroundClip = 'text'; stA.style.color = 'transparent';
+      srcs.forEach((s, i) => card(s, t, 2.5 + i * .25, null, { din: .4, dy: 10, s0: .9, blur: 4 }));
+      stream(items, t, 3.45, 19);
+      card(col, t, -1, 6.05, { dout: .5, dyOut: -16 });
+    },
+  };
+});
+
+headlineScene(T.h6, D.h6, ['Talks it through with you in real time'], { cps: 31 });
+
+/* ================================================================
+   SCENE — DeCode Real-Time (voice)
+   ================================================================ */
+addScene(T.voice, D.voice, el => {
+  const wrap = html(el, '<div class="abs" style="inset:0"></div>');
+  html(wrap, `<div class="live-pill"><span class="live-dot"></span>DeCode Real-Time</div>`);
+  const cv = html(wrap, '<canvas width="1920" height="1080" class="abs" style="left:0;top:0"></canvas>');
+  const ctx = cv.getContext('2d');
+  const who = html(wrap, '<div class="who" style="top:700px"></div>');
+  const cap1 = html(wrap, `<div class="caption" style="top:738px;color:var(--text2)">What should I call my game?</div>`);
+  const cap2 = html(wrap, `<div class="caption" style="top:738px">How about <b style="font-weight:600">Sky Sprint</b>? It’s short, fast, and easy to remember.</div>`);
+  html(wrap, `<div class="vbtn" style="left:872px;top:870px">${ico('mic')}</div>`);
+  html(wrap, `<div class="vbtn end" style="left:984px;top:870px">${ico('x')}</div>`);
+  const w1 = streamify(cap1), w2 = streamify(cap2);
+  let prev = null;
+  const U = [.7, 2.0], D = [2.45, 4.9];
+  return {
+    update(t) {
+      card(wrap, t, 0, 5.15, { din: .6, dout: .5, dy: 14, dyOut: -12 });
+      const user = prog(t, U[0], U[0] + .2) * (1 - prog(t, U[1], U[1] + .3));
+      const ai = prog(t, D[0], D[0] + .2) * (1 - prog(t, D[1], D[1] + .4));
+      const talk = (s, f) => s * (.55 + .45 * Math.abs(Math.sin(t * f) * Math.sin(t * f * .37 + 1.3)));
+      const amp = .25 + talk(user, 9) * .55 + talk(ai, 11) * 1.1;
+      // the DeCode mark breathes while listening and dances while it speaks
+      const groups = logoGroups(960, 462, .92).map((g, gi) => ({
+        k: g.k * (1 + amp * .9),
+        c: g.c.map(([x, y, r], ci) => {
+          const ph = t * (6.5 + gi * .9) + gi * 1.9 + ci * 2.3, e = .5 + .5 * Math.sin(ph);
+          const dir = ci === 0 ? -1 : ci === 2 ? 1 : 0, side = gi === 0 ? -1 : gi === 2 ? 1 : 0;
+          return [x + (ci === 1 ? side * amp * 9 * e : 0), y + dir * amp * 16 * e, r * (1 + amp * .09 * Math.sin(ph * 1.37))];
+        }),
+      }));
+      prev = rasterBlobs(ctx, groups, INK.text, 1, prev);
+      who.textContent = t < 2.3 ? 'You' : 'DeCode';
+      who.style.opacity = prog(t, .6, .8) * (1 - prog(t, 2.1, 2.25)) + prog(t, 2.35, 2.5);
+      stream(w1, t, U[0] + .1, 4.8, .25);
+      cap1.style.opacity = 1 - E.out2(prog(t, 2.15, 2.35));
+      stream(w2, t, D[0] + .05, 5.4, .25);
+    },
+  };
+});
+
+headlineScene(T.h7, D.h7, ['Connects with the tools you already use'], { cps: 31 });
+
+/* ================================================================
+   SCENE — connectors
+   ================================================================ */
+addScene(T.connect, D.connect, el => {
+  const apps = [['mail', 'Gmail'], ['cal', 'Google Calendar'], ['drive', 'Google Drive'], ['grid', 'Microsoft'], ['branch', 'GitHub'], ['disc', 'Discord'], ['play', 'YouTube'], ['pen', 'Canva']];
+  const g = html(el, '<div class="abs" style="inset:0"></div>');
+  const svg = html(g, '<svg class="abs" width="1920" height="1080" style="left:0;top:0;overflow:visible"></svg>');
+  const hub = html(g, `<div class="hub"><img src="${LOGO_ON_ACCENT}" alt=""></div>`);
+  const pos = apps.map((_, i) => { const a = (-90 + 22.5 + i * 45) * Math.PI / 180; return [960 + Math.cos(a) * 590, 540 + Math.sin(a) * 300]; });
+  const chips = apps.map(([ic, name], i) => html(g, `<div class="cchip" style="left:${pos[i][0]}px;top:${pos[i][1]}px"><div class="tile">${ico(ic)}</div>${name}</div>`));
+  const lines = pos.map(([x, y]) => {
+    const dx = x - 960, dy = y - 540, d = Math.hypot(dx, dy), ux = dx / d, uy = dy / d;
+    const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    l.setAttribute('x1', 960 + ux * 92); l.setAttribute('y1', 540 + uy * 92);
+    l.setAttribute('x2', x - ux * 40); l.setAttribute('y2', y - uy * 40);
+    l.setAttribute('stroke', 'var(--faint)'); l.setAttribute('stroke-width', '2'); l.setAttribute('stroke-linecap', 'round');
+    l.setAttribute('pathLength', '1'); l.setAttribute('stroke-dasharray', '1');
+    svg.appendChild(l);
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    p.setAttribute('r', '5'); p.setAttribute('fill', 'var(--text)');
+    svg.appendChild(p);
+    return { l, p, x1: 960 + ux * 92, y1: 540 + uy * 92, x2: x - ux * 40, y2: y - uy * 40 };
+  });
+  apps.forEach((_, i) => cue(T.connect + .55 + i * .1, 'pop', .4));
+
+  const ib = new InputBar(el, 'Invite my friends to playtest Sky Sprint on Saturday').plan(2.7, 3.15, 37, 4.85, 5.0, T.connect);
+  const perm = html(el, `<div class="perm card">
+    <div class="perm-icons">${brandTile()}<div class="perm-dots"><i></i><i></i><i></i></div><div class="tile">${ico('cal')}</div><div class="tile">${ico('mail')}</div></div>
+    <div class="perm-title">Allow DeCode to use Google Calendar and Gmail?</div>
+    <div class="perm-desc">DeCode will create the event and send the invites for you. You stay in control and can disconnect anytime.</div>
+    <div class="perm-btns"><div class="btn ghost">Not now</div><div class="btn solid">Allow</div></div></div>`);
+  const allow = $('.btn.solid', perm);
+  const cur = html(el, `<svg class="cursor" viewBox="0 0 24 24"><path d="M5 3l14 8.2-6.3 1.4 3.6 6.8-2.6 1.4-3.6-6.9L5 18.6z" fill="${THEME === 'dark' ? '#fff' : '#111'}" stroke="${THEME === 'dark' ? '#111' : '#fff'}" stroke-width="1.3" stroke-linejoin="round"/></svg>`);
+  const lead = html(el, `<div class="answer abs" style="left:520px;top:330px;width:900px">All set. Here’s what I did:</div>`);
+  const leadW = streamify(lead);
+  const r1 = html(el, `<div class="res card" style="left:520px">
+    <div class="res-top"><div class="tile">${ico('cal')}</div>Google Calendar</div>
+    <div class="res-title">Sky Sprint playtest</div>
+    <div class="res-meta">Saturday · 3:00 – 4:00 PM</div>
+    <div class="avs"><span class="av" style="background:#6366f1">S</span><span class="av" style="background:#ec4899">L</span><span class="av" style="background:#f59e0b">T</span><span class="av" style="background:#10b981">M</span></div>
+    <div class="res-foot"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5 9.5 17 19 7.5" pathLength="1" stroke-dasharray="1"/></svg>Event created</div></div>`);
+  const r2 = html(el, `<div class="res card" style="left:970px">
+    <div class="res-top"><div class="tile">${ico('mail')}</div>Gmail</div>
+    <div class="res-title">Come playtest Sky Sprint!</div>
+    <div class="res-meta">To: Sam, Lina, Theo, Maya<br><span style="color:var(--muted)">Saturday at 3 PM. Bring your fastest runs.</span></div>
+    <div class="res-foot"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12.5 9.5 17 19 7.5" pathLength="1" stroke-dasharray="1"/></svg>Invite sent</div></div>`);
+  const k1 = $('.res-foot path', r1), k2 = $('.res-foot path', r2);
+  let A = null, permTop = 0;
+  cue(T.connect + 6.18, 'click'); cue(T.connect + 7.15, 'tick', .7); cue(T.connect + 7.3, 'tick', .7);
+  return {
+    measure() {
+      permTop = 540 - perm.offsetHeight / 2;
+      perm.style.top = permTop + 'px';
+      A = offsetIn(allow, stage);
+    },
+    update(t) {
+      const ga = card(g, t, 0, 2.3, { din: .5, dout: .5, dy: 0, dyOut: 0, s0: .96, blur: 6 });
+      if (ga > 0) {
+        card(hub, t, .05, null, { din: .5, dy: 0, s0: .7, blur: 0 });
+        lines.forEach((L, i) => {
+          const d = E.out3(prog(t, .3 + i * .08, .9 + i * .08));
+          L.l.style.strokeDashoffset = 1 - d;
+          const q = ((t - 1.3 - i * .13) % 1.1) / 1.1;
+          const on = t > 1.3 + i * .13 ? 1 : 0;
+          L.p.setAttribute('cx', lerp(L.x1, L.x2, E.io2(clamp(q))));
+          L.p.setAttribute('cy', lerp(L.y1, L.y2, E.io2(clamp(q))));
+          L.p.style.opacity = on * Math.sin(clamp(q) * Math.PI) * .9;
+        });
+        chips.forEach((c, i) => {
+          const a = E.outBack(prog(t, .55 + i * .1, 1.05 + i * .1));
+          c.style.opacity = clamp(a);
+          c.style.transform = `translate(-50%,-50%) scale(${lerp(.82, 1, a)})`;
+        });
+      }
+      ib.render(t);
+      card(perm, t, 5.3, 6.4, { din: .5, dout: .4, dy: 16, blur: 8 });
+      const ca = prog(t, 5.55, 5.75) * (1 - prog(t, 6.35, 6.5));
+      const m = E.io3(prog(t, 5.55, 6.1));
+      const cx = lerp(1180, A.x + A.w * .5, m), cy = lerp(840, A.y + A.h * .55, m);
+      const press = Math.sin(prog(t, 6.15, 6.35) * Math.PI);
+      cur.style.opacity = ca;
+      cur.style.visibility = ca > 0 ? 'visible' : 'hidden';
+      cur.style.transform = `translate(${cx - 6}px,${cy - 4}px) scale(${1 - .12 * press})`;
+      allow.style.transform = `scale(${1 - .05 * press})`;
+      stream(leadW, t, 6.55, 14);
+      card(lead, t, -1, 8.05, { dout: .5, dyOut: -14 });
+      card(r1, t, 6.65, 8.05, { din: .55, dy: 20, dout: .5, dyOut: -14 });
+      card(r2, t, 6.8, 8.05, { din: .55, dy: 20, dout: .5, dyOut: -14 });
+      k1.style.strokeDashoffset = 1 - E.out3(prog(t, 7.15, 7.5));
+      k2.style.strokeDashoffset = 1 - E.out3(prog(t, 7.3, 7.65));
+    },
+  };
+});
+
+headlineScene(T.h8, D.h8, ['And helps you build it in Roblox Studio'], { cps: 31 });
+
+/* ================================================================
+   SCENE — Roblox Studio Assistant
+   ================================================================ */
+const SNIP = `local TweenService = game:GetService("TweenService")
+local platform = workspace.Obby.MovingPlatform
+
+local info = TweenInfo.new(2, Enum.EasingStyle.Sine,
+    Enum.EasingDirection.InOut, -1, true)
+TweenService:Create(platform, info, {
+    Position = platform.Position + Vector3.new(0, 0, 12)
+}):Play()`.split('\n');
+addScene(T.studio, D.studio, el => {
+  const au = [
+    html(el, '<div class="aurora" style="left:120px;top:60px;width:760px;height:620px;background:#5b8cff"></div>'),
+    html(el, '<div class="aurora" style="left:1040px;top:380px;width:760px;height:640px;background:#ff7ad9"></div>'),
+    html(el, '<div class="aurora" style="left:620px;top:520px;width:700px;height:520px;background:#ffb35c"></div>'),
+  ];
+  const win = html(el, `<div class="studio card">
+    <div class="st-bar"><div class="lights"><i></i><i></i><i></i></div><span>Home</span><span>Model</span><span>Test</span><span>Script</span>
+      <span style="margin-left:auto;display:flex;color:var(--text2)">${ico('start', 'style="width:20px;height:20px;fill:currentColor;stroke:none"')}</span>
+      <div class="title">Sky Sprint</div></div>
+    <div class="st-view"><svg width="900" height="730" viewBox="0 0 900 730"></svg></div>
+    <div class="st-panel">
+      <div class="sp-head">${brandTile()}Roblox Studio Assistant</div>
+      <div class="sp-msgs">
+        <div class="bubble-row sp-u"><div class="bubble">Add a moving platform before the finish</div></div>
+        <div class="sp-think" style="color:var(--muted)">Thinking…</div>
+        <div class="sp-text">Done. This script slides the platform back and forth:</div>
+        <div class="sp-code">${SNIP.map(l => `<div class="cl">${hl(l) || ' '}</div>`).join('')}</div>
+      </div>
+      <div class="sp-input">Ask about your game…</div>
+    </div></div>`);
+  const view = $('.st-view svg', win), su = $('.sp-u', win), sthink = $('.sp-think', win), stext = streamify($('.sp-text', win));
+  const scode = $$('.sp-code .cl', win), scodeBox = $('.sp-code', win);
+  sthink.style.position = 'absolute'; sthink.style.marginTop = '0'; sthink.style.top = '62px';
+
+  // iso obby world
+  const S = 22, OX = 196, OY = 560;
+  const pj = (x, y, z) => [OX + (x - z) * .866 * S, OY + (x + z) * .5 * S - y * S];
+  const sh = (hex, f) => { const n = parseInt(hex.slice(1), 16); return `rgb(${Math.round((n >> 16 & 255) * f)},${Math.round((n >> 8 & 255) * f)},${Math.round((n & 255) * f)})`; };
+  const blocks = [
+    { x: 0, y: 0, z: 0, w: 4, h: 1, d: 4, c: '#a7b0ba', t: .35 },
+    { x: 1, y: 1, z: -5, w: 3, h: 1, d: 3, c: '#ff5a5f', t: .55 },
+    { x: -1, y: 2, z: -9.5, w: 3, h: 1, d: 3, c: '#ffae2b', t: .75 },
+    { x: 1, y: 3, z: -14, w: 3, h: .6, d: 3, c: '#2fcf73', t: .95 },
+    { x: 0, y: 4, z: -18.5, w: 2.6, h: 1, d: 2.6, c: '#3d8bff', t: 1.15 },
+    { x: 0, y: 5, z: -23, w: 3, h: 1, d: 3, c: '#a259ff', t: 3.15, mover: true },
+    { x: -.5, y: 6, z: -29, w: 4, h: 1, d: 4, c: '#f4f4f4', t: 1.35 },
+    { x: 1.2, y: 7, z: -27.6, w: .3, h: 3.4, d: .3, c: '#3a3a3a', t: 1.5 },
+    { x: 1.5, y: 9.2, z: -27.6, w: 1.6, h: 1, d: .2, c: '#ff5a5f', t: 1.6 },
+  ];
+  blocks.forEach(b => cue(T.studio + b.t, 'pop', .35));
+  const top = b => [b.x + b.w / 2, b.y + b.h, b.z + b.d / 2];
+  const hops = [top(blocks[0]), top(blocks[1]), top(blocks[2]), top(blocks[3]), top(blocks[4])];
+  function box(x, y, z, w, h, d, c, a) {
+    const P = (...v) => pj(...v).map(n => n.toFixed(1)).join(',');
+    const t = [P(x, y + h, z), P(x + w, y + h, z), P(x + w, y + h, z + d), P(x, y + h, z + d)];
+    const r = [P(x + w, y, z), P(x + w, y + h, z), P(x + w, y + h, z + d), P(x + w, y, z + d)];
+    const l = [P(x, y, z + d), P(x + w, y, z + d), P(x + w, y + h, z + d), P(x, y + h, z + d)];
+    return `<g opacity="${a.toFixed(3)}"><polygon points="${l.join(' ')}" fill="${sh(c, .8)}"/><polygon points="${r.join(' ')}" fill="${sh(c, .64)}"/><polygon points="${t.join(' ')}" fill="${c}"/></g>`;
+  }
+  cue(T.studio + 1.0, 'pop', .5); cue(T.studio + 2.55, 'tick', .4);
+  return {
+    update(t) {
+      const wa = card(win, t, 0, 6.3, { din: .65, dout: .55, dy: 26, dyOut: -16, s0: .965, blur: 10 });
+      au.forEach((a, i) => { a.style.opacity = wa * (THEME === 'dark' ? .22 : .38); a.style.transform = `translate(${Math.sin(t * .5 + i * 2) * 30}px,${Math.cos(t * .4 + i) * 24}px)`; });
+      if (wa <= 0) return;
+      // world
+      const items = [];
+      blocks.forEach(b => {
+        const a = E.out3(prog(t, b.t, b.t + .5)), dy = (1 - E.outBack(prog(t, b.t, b.t + .55))) * 5;
+        let x = b.x;
+        if (b.mover) x += Math.sin(Math.max(0, t - 3.7) * 1.7) * 3 * E.io2(prog(t, 3.7, 4.3));
+        if (a > 0) items.push({ k: x + b.z + b.w / 2 + b.d / 2 - (b.mover ? 1 : 0), y: b.y, s: box(x, b.y + dy, b.z, b.w, b.h, b.d, b.c, a) });
+      });
+      // player hopping across the first checkpoints
+      const ht = (t - 3.9) / .62, hi = clamp(Math.floor(ht), 0, hops.length - 2), hf = clamp(ht - hi);
+      const A = hops[hi], B = hops[hi + 1];
+      let p = ht < 0 ? hops[0] : ht >= hops.length - 1 ? hops[hops.length - 1] : [lerp(A[0], B[0], E.io2(hf)), lerp(A[1], B[1], hf) + Math.sin(hf * Math.PI) * 2.4, lerp(A[2], B[2], E.io2(hf))];
+      const pa = E.out3(prog(t, 1.7, 2.1));
+      if (pa > 0) items.push({ k: p[0] + p[2] + .2, y: p[1] + 1, s: box(p[0] - .45, p[1], p[2] - .45, .9, 1.25, .9, '#2f6fe0', pa) + box(p[0] - .35, p[1] + 1.25, p[2] - .35, .7, .65, .7, '#ffcf3a', pa) });
+      items.sort((a, b) => a.k - b.k || a.y - b.y);
+      const clouds = [[140, 120, 90], [560, 80, 120], [760, 230, 70], [300, 330, 60]].map(([x, y, r], i) =>
+        `<ellipse cx="${x + ((t * (6 + i * 3)) % 1000) - 60}" cy="${y}" rx="${r}" ry="${r * .32}" fill="#fff" opacity=".55"/>`).join('');
+      view.innerHTML = clouds + items.map(i => i.s).join('');
+      // assistant panel
+      card(su, t, 1.0, null, { din: .4, dy: 10, blur: 4 });
+      sthink.style.opacity = prog(t, 1.4, 1.6) * (1 - prog(t, 1.95, 2.1)) * (.6 + .4 * Math.sin(t * 7));
+      stream(stext, t, 2.05, 20);
+      card(scodeBox, t, 2.45, null, { din: .4, dy: 8, blur: 3 });
+      scode.forEach((l, i) => { const a = E.out3(prog(t, 2.55 + i * .1, 2.85 + i * .1)); l.style.opacity = a; l.style.transform = `translateX(${(1 - a) * 8}px)`; });
+    },
+  };
+});
+
+headlineScene(T.h9, D.h9, ['From one question to something real'], { cps: 29, size: 70 });
+
+/* ================================================================
+   FINALE — the circles gather into the DeCode mark
+   ================================================================ */
+addScene(T.final, D.final, el => {
+  const cv = html(el, '<canvas id="meta" width="1920" height="1080"></canvas>');
+  const ctx = cv.getContext('2d');
+  const wm = html(el, '<div class="wordmark">DeCode</div>');
+  const soon = html(el, '<div class="soon" style="top:640px"><span><i></i>Coming soon</span></div>');
+  const url = html(el, '<div class="url" style="top:716px">decodeai.net</div>');
+  const all = [];
+  LOGO.forEach((g, gi) => g.c.forEach((c, ci) => all.push({ gi, ci, i: all.length })));
+  const LS = .66, CY = 500;
+  let wmW = 0, prev = null;
+  cue(T.final + .05, 'rise'); cue(T.final + 1.45, 'chime'); cue(T.final + 2.0, 'swoosh', .5);
+  return {
+    measure() { wmW = wm.offsetWidth; },
+    update(t) {
+      const logoW = 407 * LS, gapPx = 48, total = logoW + gapPx + wmW;
+      const shift = E.io3(prog(t, 1.85, 2.6));
+      const cx = lerp(960, 960 - total / 2 + logoW / 2, shift);
+      const pop = 1 + .045 * Math.sin(prog(t, 1.25, 1.85) * Math.PI);
+      const fade = 1 - E.io2(prog(t, 5.25, 5.85));
+      const finalG = logoGroups(cx, CY, LS * pop);
+      const groups = finalG.map(g => ({ k: g.k, c: g.c.map(c => c.slice()) }));
+      let kMix = 0;
+      all.forEach(({ gi, ci, i }) => {
+        const s0 = .08 + i * .055, p = E.io3(prog(t, s0, s0 + 1.15));
+        const ang = i / 9 * Math.PI * 2 - Math.PI / 2 + (1 - p) * 1.1;
+        const dist = (1 - p) * 520;
+        const c = groups[gi].c[ci];
+        c[0] += Math.cos(ang) * dist; c[1] += Math.sin(ang) * dist * .62;
+        c[2] *= lerp(.22, 1, E.out3(p));
+        kMix += p / 9;
+      });
+      groups.forEach(g => g.k *= E.in2(kMix));
+      const appear = E.out2(prog(t, 0, .35));
+      prev = rasterBlobs(ctx, groups, INK.text, appear * fade, prev);
+      const wa = E.out3(prog(t, 2.05, 2.8));
+      wm.style.left = (cx + logoW / 2 + gapPx) + 'px';
+      wm.style.top = (CY - 64) + 'px';
+      wm.style.opacity = fade;
+      wm.style.clipPath = `inset(-20% ${(1 - wa) * 100}% -20% 0)`;
+      wm.style.transform = `translateX(${(1 - wa) * -24}px)`;
+      card(soon, t, 2.9, 5.25, { din: .55, dy: 14, blur: 6, dout: .6, dyOut: 0 });
+      card(url, t, 3.15, 5.25, { din: .55, dy: 10, blur: 4, dout: .6, dyOut: 0 });
+    },
+  };
+});
+
+/* ---------- driver ---------- */
+let measured = false;
+function render(t) {
+  if (!measured) { scenes.forEach(s => s.measure()); measured = true; }
+  for (const s of scenes) {
+    const on = t >= s.start && t < s.end;
+    s.el.style.display = on ? 'block' : 'none';
+    if (on && !s._m) { s._m = 1; s.measure(); }
+    if (on) s.update(t - s.start);
+  }
+}
+const ready = document.fonts.ready.then(() => {
+  // measure everything once while visible so text metrics are real
+  for (const s of scenes) { s.el.style.display = 'block'; }
+  scenes.forEach(s => { s.measure(); s._m = 1; });
+  for (const s of scenes) { s.el.style.display = 'none'; }
+  measured = true;
+});
+window.__duration = DURATION;
+window.__T = T;
+window.__cues = CUES.sort((a, b) => a.t - b.t);
+window.__ready = ready;
+window.__render = t => render(t);
+
+if (!RENDER) {
+  const fit = () => { const s = Math.min(innerWidth / 1920, (innerHeight - 44) / 1080); stage.style.transform = `scale(${s})`; stage.style.left = (innerWidth - 1920 * s) / 2 + 'px'; stage.style.top = (innerHeight - 44 - 1080 * s) / 2 + 'px'; };
+  addEventListener('resize', fit); fit();
+  const ui = html(document.body, `<div id="ui"><button id="pp">❚❚</button><input id="sc" type="range" min="0" max="${DURATION}" step="0.01" value="0"><span id="tc"></span></div>`);
+  let playing = !P.has('t'), t0 = performance.now() / 1000 - (+P.get('t') || 0), cur = +P.get('t') || 0;
+  const pp = $('#pp'), sc = $('#sc'), tc = $('#tc');
+  const toggle = () => { playing = !playing; t0 = performance.now() / 1000 - cur; pp.textContent = playing ? '❚❚' : '▶'; };
+  pp.onclick = toggle;
+  sc.oninput = () => { cur = +sc.value; t0 = performance.now() / 1000 - cur; render(cur); };
+  addEventListener('keydown', e => {
+    if (e.code === 'Space') { e.preventDefault(); toggle(); }
+    if (e.code === 'ArrowRight' || e.code === 'ArrowLeft') { cur = clamp(cur + (e.code === 'ArrowRight' ? 1 : -1), 0, DURATION); t0 = performance.now() / 1000 - cur; render(cur); }
+  });
+  ready.then(() => {
+    pp.textContent = playing ? '❚❚' : '▶';
+    (function loop() {
+      if (playing) { cur = (performance.now() / 1000 - t0) % DURATION; }
+      render(cur); sc.value = cur; tc.textContent = cur.toFixed(2) + ' / ' + DURATION.toFixed(2) + 's';
+      requestAnimationFrame(loop);
+    })();
+  });
+}
+</script>
+</body>
+</html>
