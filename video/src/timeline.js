@@ -155,24 +155,6 @@ function buildScenes(C) {
   // 3 ── what it is ──────────────────────────────────────────────────────────
   headlineScene(C.tagline, ['One AI workspace to think,', 'code, research, and create.'], { cps: 30 });
 
-  // 4 ── COMING SOON, big and early ───────────────────────────────────────────
-  scene(C.soon.start - 0.05, C.soon.out + 0.5, root => {
-    const h = new Headline(root, [[['Coming '], ['soon', 'blue']]], { start: C.soon.start, out: C.soon.out, size: 236, weight: 600, cps: 14, cy: 488 });
-    const pill = el('div', 'pill pill--dev', root, `<span class="pill__dot"></span><span>The DeCode app is in development · decodeai.net</span>`);
-    const dot = pill.querySelector('.pill__dot');
-    return {
-      measure: () => { h.measure(); pill.style.marginLeft = -(pill.offsetWidth / 2) + 'px'; pill.style.top = '668px'; },
-      update(t) {
-        h.update(t);
-        const io = inOut(t, C.soon.start + 0.85, C.soon.out, { dIn: 0.5, yIn: 24 });
-        vis(pill, io);
-        const ph = ((t - C.soon.start) / 1.4) % 1;
-        dot.style.boxShadow = `0 0 0 ${(ph * 16).toFixed(1)}px rgba(59,130,246,${(0.55 * (1 - ph)).toFixed(3)})`;
-      },
-    };
-  });
-  bg.addRipple(C.soon.start + 0.05, W / 2, 470);
-
   // 5 ── deeper ─────────────────────────────────────────────────────────────
   headlineScene(C.deepTitle, ['Goes deeper when you need it to'], { cps: 26 });
 

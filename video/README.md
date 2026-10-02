@@ -1,6 +1,6 @@
 # DeCode — launch motion piece
 
-A ~103 s, 1920×1080 / 30 fps motion-graphics film for DeCode. The structure,
+A ~98 s, 1920×1080 / 30 fps motion-graphics film for DeCode. The structure,
 pacing, and motion follow the reference launch video. The content is DeCode's:
 it is set in a dark theme on decodeai.net's blue dot-matrix background.
 
@@ -13,13 +13,12 @@ Output: `dist/decode-motion-graphics.mp4`
 | 0:00 | Feature picker | A menu of DeCode features (Chat, Writing, Learning, Web research, Code generation, Image generation, Real-time voice, Roblox Studio Assistant) expands, then collapses into one item: **DeCode, Everything in one workspace** ✓ |
 | 0:06 | Introducing DeCode | Type-on headline |
 | 0:09 | One AI workspace to think, code, research, and create. | |
-| 0:14 | **Coming soon** | Large text, plus "The DeCode app is in development · decodeai.net" |
-| 0:19 | Goes deeper when you need it to | *Pro* model: compound-interest question, "Starting thinking" → "Thinking" statuses, then the streamed answer with a table (figures verified) |
-| 0:37 | Answers fast when you want it to | *Instant* model: a quick team note |
-| 0:47 | Real-time is available in DeCode. | Text only, as requested |
-| 0:52 | DeCode is great at coding | Asks for a focus timer in a single HTML file. The code streams in a DeCode code block, **Run** opens the HTML preview, and Start counts down. Two more single-file previews follow (Game of Life, analog clock). |
-| 1:14 | Image Generation | Prompt → "Thinking" → the image appears in chat with "Here's your mountain lake at sunrise. Do you like it?" |
-| 1:30 | Everything you need, decoded. → Coming soon to decodeai.net → DeCode wordmark → logo | |
+| 0:14 | Goes deeper when you need it to | *Pro* model: compound-interest question, "Starting thinking" → "Thinking" statuses, then the streamed answer with a table (figures verified) |
+| 0:32 | Answers fast when you want it to | *Instant* model: a quick team note |
+| 0:42 | Real-time is available in DeCode. | Text only, as requested |
+| 0:47 | DeCode is great at coding | Asks for a focus timer in a single HTML file. The code streams in a DeCode code block, **Run** opens the HTML preview, and Start counts down. Two more single-file previews follow (Game of Life, analog clock). |
+| 1:09 | Image Generation | Prompt → "Thinking" → the image appears in chat with "Here's your mountain lake at sunrise. Do you like it?" |
+| 1:25 | Everything you need, decoded. → Coming soon to decodeai.net → DeCode wordmark → logo | |
 
 ## Accuracy notes
 

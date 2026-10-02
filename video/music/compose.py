@@ -238,7 +238,7 @@ cue = C
 deep, fast, code, img = cue['deep'], cue['fast'], cue['code'], cue['img']
 DRUMS = [(cue['intro']['start'], deep['send'] + 0.2), (deep['chat'], cue['realtime']['start']),
          (cue['codeTitle']['start'], img['send'] + 0.2), (img['reveal'], LOGO - 0.05)]
-CLAP = [(cue['soon']['start'], cue['deepTitle']['start']), (cue['fastTitle']['start'], cue['realtime']['start']),
+CLAP = [(cue['fastTitle']['start'], cue['realtime']['start']),
         (code['chat'], cue['imgTitle']['start']), (cue['end1']['start'], LOGO - 0.05)]
 HAT16 = [(fast['appear'], cue['realtime']['start']), (code['montage'], code['out'] + 0.4),
          (cue['end2']['start'], LOGO - 0.05)]
@@ -309,13 +309,13 @@ while True:
     beat += 1
 
 # risers into the big moments, impacts on them
-for hit, rdur, big in [(cue['intro']['start'], 1.6, 0.7), (cue['soon']['start'], 1.9, 1.0),
+for hit, rdur, big in [(cue['intro']['start'], 1.6, 0.7),
                        (cue['codeTitle']['start'], 1.5, 0.6), (img['reveal'], 2.2, 0.75), (LOGO, 2.4, 1.0)]:
     add(fx, hit - rdur, riser(rdur, 0.5 * big), gain=0.55)
     add(fx, hit, impact(big), gain=0.5)
 
 # bells on reveals / selections
-for tt, m, v in [(cue['picker']['select'], 84, 0.5), (cue['soon']['start'], 76, 0.45), (cue['realtime']['start'], 79, 0.55),
+for tt, m, v in [(cue['picker']['select'], 84, 0.5), (cue['realtime']['start'], 79, 0.55),
                  (cue['realtime']['start'] + BEAT * 1.5, 83, 0.35), (img['reveal'], 84, 0.45), (LOGO, 72, 0.55), (LOGO, 79, 0.4)]:
     add(fx, tt, bell(m, v), pan=0.15, gain=0.3)
 
