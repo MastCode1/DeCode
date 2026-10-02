@@ -1,0 +1,14 @@
+{
+  "name": "decode-brand-film",
+  "private": true,
+  "type": "module",
+  "description": "DeCode brand film: deterministic HTML motion composition rendered to MP4.",
+  "scripts": {
+    "render": "node render.mjs",
+    "stills": "node render.mjs --stills 2.4,6.6,10.6,14.6,18.9,22.7,27.2",
+    "score": "node score.mjs build/cues.json build/score.wav"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}
