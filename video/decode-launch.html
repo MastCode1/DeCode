@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DeCode Launch Film</title>
+<style>
+@font-face { font-family: Geist; src: url(fonts/geist-sans-latin-400-normal.woff2) format('woff2'); font-weight: 400; font-display: block; }
+@font-face { font-family: Geist; src: url(fonts/geist-sans-latin-500-normal.woff2) format('woff2'); font-weight: 500; }
+@font-face { font-family: Geist; src: url(fonts/geist-sans-latin-600-normal.woff2) format('woff2'); font-weight: 600; }
+@font-face { font-family: Geist; src: url(fonts/geist-sans-latin-700-normal.woff2) format('woff2'); font-weight: 700; }
+@font-face { font-family: 'Geist Mono'; src: url(fonts/geist-mono-latin-400-normal.woff2) format('woff2'); font-weight: 400; }
+@font-face { font-family: 'Geist Mono'; src: url(fonts/geist-mono-latin-500-normal.woff2) format('woff2'); font-weight: 500; }
+
+:root {
+  --bg: #07080b;
+  --ink: #f4f5f8;
+  --ink2: #c8cbd5;
+  --mute: #868a96;
+  --line: rgba(255, 255, 255, .08);
+  --card: #121318;
+  --field: #18191e;
+  --accent: #93b2ff;
+  --accent2: #b6a6ff;
+}
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+#stage {
+  position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden;
+  background: var(--bg); color: var(--ink); transform-origin: 0 0;
+  font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+}
+#stage canvas { position: absolute; left: 0; top: 0; }
+#fade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
+.scene { position: absolute; inset: 0; transform-origin: 50% 50%; display: none; }
+.abs { position: absolute; }
+.w { display: inline-block; white-space: pre; }
+.grad {
+  background: linear-gradient(100deg, #ffffff 0%, #dfe6ff 35%, var(--accent) 70%, var(--accent2) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.accent { color: var(--accent); }
+
+/* Headlines */
+.headline {
+  position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%);
+  text-align: center; font-size: 86px; font-weight: 500; letter-spacing: -0.035em; line-height: 1.14;
+}
+.headline .line { white-space: nowrap; }
+
+/* Cards */
+.card {
+  position: absolute; box-sizing: border-box;
+  background: linear-gradient(180deg, #15161c 0%, #101115 100%);
+  border: 1px solid rgba(255, 255, 255, .075); border-radius: 28px;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, .55), inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+/* Picker */
+.picker { left: 50%; width: 640px; margin-left: -320px; overflow: hidden; }
+.prow {
+  position: absolute; left: 10px; right: 10px; height: 84px; display: flex; align-items: center; gap: 20px;
+  padding: 0 22px; box-sizing: border-box; border-radius: 18px;
+}
+.ptile {
+  width: 48px; height: 48px; border-radius: 14px; background: #1e2028; display: grid; place-items: center;
+  color: #c9ccd6; flex: none; border: 1px solid rgba(255, 255, 255, .05);
+}
+.ptile svg { width: 24px; height: 24px; }
+.ptitle { font-size: 26px; font-weight: 500; letter-spacing: -0.01em; }
+.psub { font-size: 19px; color: var(--mute); margin-top: 2px; }
+.phover { position: absolute; left: 10px; right: 10px; height: 84px; border-radius: 18px; background: rgba(255, 255, 255, .055); }
+.pcheck { margin-left: auto; width: 30px; height: 30px; color: var(--accent); }
+
+/* Composer */
+.composer {
+  position: absolute; box-sizing: border-box; background: var(--field);
+  border: 1px solid rgba(255, 255, 255, .07); box-shadow: 0 30px 90px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .04);
+  overflow: hidden;
+}
+.cp-in { position: absolute; left: 0; top: 0; width: 1080px; height: 92px; display: flex; align-items: center; gap: 20px; padding: 0 16px 0 30px; box-sizing: border-box; }
+.cp-icon { width: 30px; height: 30px; color: #c9ccd6; flex: none; }
+.cp-text { flex: 1; font-size: 29px; color: #eceef3; white-space: nowrap; overflow: hidden; position: relative; height: 40px; line-height: 40px; letter-spacing: -0.005em; }
+.cp-ph { position: absolute; left: 0; top: 0; color: #7b7e89; }
+.caret { display: inline-block; width: 2.5px; height: 33px; background: #e9ebf2; vertical-align: -7px; margin-left: 2px; border-radius: 2px; }
+.cp-send { width: 60px; height: 60px; border-radius: 50%; background: #f7f7f7; position: relative; flex: none; color: #0b0c10; }
+.cp-send svg { position: absolute; left: 50%; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px; }
+
+/* Chat */
+.bubble {
+  position: absolute; right: 380px; max-width: 1000px; box-sizing: border-box; padding: 20px 28px;
+  border-radius: 30px; background: #1c1e25; font-size: 27px; line-height: 1.45; color: #eceef3; border: 1px solid rgba(255,255,255,.05);
+}
+.resp { position: absolute; left: 380px; width: 1160px; font-size: 31px; line-height: 1.5; color: var(--ink2); letter-spacing: -0.005em; }
+.resp b { color: var(--ink); font-weight: 600; }
+.thinking { position: absolute; left: 0; right: 0; top: 50%; height: 80px; margin-top: -40px; }
+.think-ph {
+  position: absolute; left: 0; right: 0; text-align: center; font-size: 62px; font-weight: 500; letter-spacing: -0.03em;
+  background: linear-gradient(100deg, #565a66 0%, #565a66 38%, #f3f5ff 50%, #565a66 62%, #565a66 100%);
+  background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* Gantt */
+.gantt { left: 380px; top: 400px; width: 1160px; height: 520px; }
+.g-title { position: absolute; left: 44px; top: 36px; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; display: flex; align-items: center; gap: 14px; }
+.chip { display: inline-flex; align-items: center; gap: 10px; height: 38px; padding: 0 16px; border-radius: 19px; background: #1d1f27; color: var(--ink2); font-size: 19px; font-weight: 500; border: 1px solid rgba(255,255,255,.06); white-space: nowrap; }
+.g-week { position: absolute; top: 110px; font-size: 19px; color: var(--mute); font-weight: 500; }
+.g-vline { position: absolute; top: 148px; bottom: 30px; width: 0; border-left: 1px dashed rgba(255, 255, 255, .09); }
+.g-label { position: absolute; left: 44px; font-size: 24px; font-weight: 500; color: var(--ink2); height: 52px; line-height: 52px; }
+.g-bar { position: absolute; height: 52px; border-radius: 15px; overflow: hidden; }
+.g-bar span { position: absolute; left: 20px; top: 0; line-height: 52px; font-size: 20px; font-weight: 600; color: #0b0d14; white-space: nowrap; }
+.g-mile { position: absolute; width: 30px; height: 30px; background: #fff; transform: rotate(45deg); border-radius: 5px; box-shadow: 0 0 30px rgba(147,178,255,.9); }
+.g-milelabel { position: absolute; font-size: 22px; font-weight: 600; color: #fff; white-space: nowrap; }
+.g-ring { position: absolute; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--accent); }
+
+/* Code */
+.ed-head { position: absolute; left: 0; right: 0; top: 0; height: 60px; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: center; padding: 0 24px; gap: 14px; box-sizing: border-box; }
+.ed-tab { display: flex; align-items: center; gap: 10px; font-size: 19px; color: var(--ink); font-family: 'Geist Mono', monospace; background: #1b1d24; height: 38px; padding: 0 16px; border-radius: 10px; }
+.ed-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+.ed-status { margin-left: auto; font-size: 19px; color: var(--mute); display: flex; align-items: center; gap: 10px; }
+.ed-body { position: absolute; left: 0; right: 0; top: 60px; bottom: 0; padding-top: 24px; font-family: 'Geist Mono', monospace; font-size: 22.5px; line-height: 35px; }
+.ed-line { position: relative; height: 35px; white-space: pre; }
+.ed-ln { position: absolute; left: 0; width: 66px; text-align: right; color: #4c505b; }
+.ed-code { position: absolute; left: 96px; color: #e6e7ec; }
+.ed-hl { position: absolute; left: 0; right: 0; height: 35px; background: rgba(147, 178, 255, .08); border-left: 3px solid var(--accent); box-sizing: border-box; }
+.t-kw { color: #c3a6ff; } .t-fn { color: #93b2ff; } .t-str { color: #a9e5b8; } .t-tag { color: #7fd1ff; }
+.t-attr { color: #f5c38b; } .t-p { color: #8b8f9b; } .t-num { color: #f5a3a3; }
+
+/* Browser preview */
+.browser { overflow: hidden; background: #f5f4f0; border: 1px solid rgba(255,255,255,.12); }
+.br-bar { position: absolute; left: 0; right: 0; top: 0; height: 54px; background: #e9e8e3; display: flex; align-items: center; padding: 0 20px; gap: 9px; box-sizing: border-box; }
+.br-bar i { width: 14px; height: 14px; border-radius: 50%; display: block; }
+.br-url { position: absolute; left: 50%; width: 340px; margin-left: -170px; height: 34px; border-radius: 17px; background: #f7f6f2; color: #6f6d68; font-size: 17px; text-align: center; line-height: 34px; }
+.op { position: absolute; left: 0; right: 0; top: 54px; bottom: 0; color: #15161a; }
+.op-nav { position: absolute; left: 40px; right: 40px; top: 28px; display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+.op-nav .r { margin-left: auto; font-size: 18px; font-weight: 500; color: #6b6a66; }
+.op-h1 { position: absolute; left: 0; right: 0; top: 214px; text-align: center; font-size: 64px; font-weight: 600; letter-spacing: -0.04em; }
+.op-p { position: absolute; left: 0; right: 0; top: 304px; text-align: center; font-size: 24px; color: #6b6a66; }
+.op-form { position: absolute; left: 50%; top: 380px; width: 720px; margin-left: -360px; display: flex; gap: 14px; }
+.op-input { flex: 1; height: 64px; border-radius: 32px; background: #fff; border: 1.5px solid #d9d7d0; box-sizing: border-box; padding: 0 26px; font-size: 22px; line-height: 61px; color: #15161a; white-space: nowrap; overflow: hidden; }
+.op-input { position: relative; }
+.op-input .ph { color: #a3a19b; position: absolute; left: 26px; top: 0; }
+.op-btn { position: relative; width: 268px; height: 64px; border-radius: 32px; background: #15161a; color: #fff; font-size: 21px; font-weight: 600; overflow: hidden; }
+.op-btn span { position: absolute; left: 0; right: 0; top: 0; line-height: 64px; text-align: center; white-space: nowrap; }
+.op-note { position: absolute; left: 0; right: 0; top: 476px; text-align: center; font-size: 18px; color: #8d8b85; }
+.cursor { position: absolute; width: 38px; height: 38px; left: 0; top: 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,.35)); }
+
+/* Research */
+.src-chip { position: absolute; height: 46px; padding: 0 18px 0 12px; border-radius: 23px; background: #1a1c23; border: 1px solid rgba(255,255,255,.07); display: flex; align-items: center; gap: 10px; font-size: 19px; color: var(--ink2); white-space: nowrap; font-weight: 500; }
+.src-chip i { width: 24px; height: 24px; border-radius: 7px; display: grid; place-items: center; font-style: normal; font-size: 13px; font-weight: 700; color: #0b0d14; }
+.tile { top: 370px; width: 373px; height: 330px; }
+.tile .big { position: absolute; left: 36px; top: 34px; font-size: 64px; font-weight: 600; letter-spacing: -0.04em; color: #fff; }
+.tile .lab { position: absolute; left: 36px; top: 120px; font-size: 22px; color: var(--mute); }
+.hist { position: absolute; left: 36px; right: 36px; bottom: 36px; height: 110px; display: flex; align-items: flex-end; gap: 12px; }
+.hist div { flex: 1; border-radius: 8px 8px 4px 4px; background: linear-gradient(180deg, var(--accent), rgba(147,178,255,.25)); }
+.hist div.on { background: linear-gradient(180deg, #fff, var(--accent)); }
+
+/* Doc */
+.doc { left: 360px; top: 110px; width: 1200px; height: 820px; }
+.doc-head { position: absolute; left: 0; right: 0; top: 0; height: 66px; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; align-items: center; gap: 14px; padding: 0 30px; box-sizing: border-box; font-size: 20px; color: var(--ink2); }
+.doc-head svg { width: 24px; height: 24px; color: var(--accent); }
+.doc-head .r { margin-left: auto; color: var(--mute); font-size: 18px; }
+.doc-body { position: absolute; left: 100px; top: 130px; width: 1000px; }
+.doc-title { font-size: 60px; font-weight: 600; letter-spacing: -0.035em; height: 76px; color: #fff; }
+.doc-text { margin-top: 30px; font-size: 32px; line-height: 1.62; color: #d4d7df; letter-spacing: -0.005em; position: relative; }
+.doc-text p { margin: 0 0 22px; }
+.sel { background-image: linear-gradient(rgba(147, 178, 255, .32), rgba(147, 178, 255, .32)); background-repeat: no-repeat; background-size: 0% 100%; border-radius: 4px; }
+.ask { position: absolute; height: 52px; padding: 0 22px 0 16px; border-radius: 26px; background: #f4f5f8; color: #0c0d12; font-size: 21px; font-weight: 600; display: flex; align-items: center; gap: 10px; white-space: nowrap; box-shadow: 0 16px 40px rgba(0,0,0,.45); }
+.ask svg { width: 22px; height: 22px; }
+.mini { position: absolute; left: 100px; right: 100px; bottom: 60px; height: 150px; border-radius: 28px; background: #1a1c22; border: 1px solid rgba(255,255,255,.08); box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+.mini-q { position: absolute; left: 30px; right: 30px; top: 22px; font-size: 20px; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; gap: 12px; align-items: center; }
+.mini-q b { width: 3px; height: 26px; background: var(--accent); border-radius: 2px; flex: none; }
+.mini-in { position: absolute; left: 30px; right: 100px; bottom: 26px; font-size: 27px; color: #eceef3; height: 40px; line-height: 40px; white-space: nowrap; }
+.mini .cp-send { position: absolute; right: 18px; bottom: 16px; width: 56px; height: 56px; }
+
+/* Voice */
+.badge { position: absolute; left: 50%; top: 120px; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; height: 54px; padding: 0 22px 0 8px; border-radius: 27px; border: 1px solid rgba(255,255,255,.1); background: rgba(16,17,22,.8); font-size: 22px; color: var(--ink2); white-space: nowrap; }
+.badge b { background: #f4f5f8; color: #0c0d12; border-radius: 19px; height: 38px; line-height: 38px; padding: 0 16px; font-weight: 600; font-size: 19px; }
+.cap { position: absolute; left: 0; right: 0; text-align: center; }
+.cap .who { font-size: 19px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); font-weight: 600; margin-bottom: 14px; }
+.cap .say { font-size: 46px; font-weight: 500; letter-spacing: -0.03em; }
+.notif { left: 50%; width: 700px; margin-left: -350px; top: 850px; height: 112px; border-radius: 30px; display: flex; align-items: center; gap: 22px; padding: 0 30px; }
+.notif .ic { width: 60px; height: 60px; border-radius: 50%; background: var(--accent); color: #0b0d14; display: grid; place-items: center; flex: none; }
+.notif .ic svg { width: 32px; height: 32px; }
+.notif .t1 { font-size: 27px; font-weight: 600; letter-spacing: -0.02em; }
+.notif .t2 { font-size: 20px; color: var(--mute); margin-top: 4px; }
+
+/* Outro */
+.wordmark { position: absolute; left: 0; right: 0; top: 50%; margin-top: -80px; height: 160px; line-height: 160px; text-align: center; font-size: 150px; font-weight: 600; letter-spacing: -0.05em; white-space: pre; }
+
+/* Preview controls (hidden in render mode) */
+#ui { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 10px 16px; background: rgba(0,0,0,.75); color: #ddd; font: 13px system-ui, sans-serif; z-index: 10; }
+#ui input[type=range] { flex: 1; }
+#ui button { background: #222; color: #eee; border: 1px solid #444; border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+body.render #ui { display: none; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="bg" width="1920" height="1080"></canvas>
+  <canvas id="fx" width="1920" height="1080"></canvas>
+  <div id="scenes"></div>
+  <canvas id="top" width="1920" height="1080"></canvas>
+  <div id="fade"></div>
+</div>
+<div id="ui"><button id="play">Pause</button><input id="scrub" type="range" min="0" max="1000" value="0"><span id="time">0.00s</span></div>
+<script src="assets/logo-points.js"></script>
+<script>
+'use strict';
+/* =========================================================================
+   DeCode launch film: a deterministic motion-graphics composition.
+   Every frame is a pure function of time t (seconds): window.seek(t).
+   No animation libraries or plugins; just DOM, CSS and canvas.
+   ========================================================================= */
+const W = 1920, H = 1080, FPS = 60;
+const RENDER = /[?&]render/.test(location.search);
+if (RENDER) document.body.classList.add('render');
+
+/* ---------- math helpers ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const p = (t, s, d) => clamp((t - s) / d);
+const smooth = (a, b, x) => { const k = clamp((x - a) / (b - a)); return k * k * (3 - 2 * k); };
+const E = {
+  lin: x => x,
+  outCubic: x => 1 - Math.pow(1 - x, 3),
+  inCubic: x => x * x * x,
+  inOutCubic: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  outQuint: x => 1 - Math.pow(1 - x, 5),
+  inOutQuint: x => x < .5 ? 16 * x ** 5 : 1 - Math.pow(-2 * x + 2, 5) / 2,
+  outExpo: x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x),
+  inOutSine: x => -(Math.cos(Math.PI * x) - 1) / 2,
+  outBack: x => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+  spring: x => x >= 1 ? 1 : 1 - Math.exp(-6.5 * x) * Math.cos(9.5 * x),
+};
+function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function hash2(i, j) { let h = (i * 374761393 + j * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; }
+function noise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+  const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const a = hash2(xi, yi), b = hash2(xi + 1, yi), c = hash2(xi, yi + 1), d = hash2(xi + 1, yi + 1);
+  return lerp(lerp(a, b, u), lerp(c, d, u), v);
+}
+const fbm = (x, y) => noise(x, y) * .65 + noise(x * 2.03 + 17.1, y * 2.03 - 9.4) * .35;
+
+/* ---------- sound cues: scenes report key moments; render.mjs --cues collects them ---------- */
+const CUES = {};
+const cue = (name, t) => { CUES[name] = +t.toFixed(4); };
+const TYPED = [], CODE_EL = [];
+
+/* ---------- DOM helpers ---------- */
+const $ = id => document.getElementById(id);
+const stage = $('stage'), scenesEl = $('scenes');
+function el(tag, cls, parent, html) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html != null) e.innerHTML = html;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function setStyle(e, o) { for (const k in o) e.style[k] = o[k]; }
+function fadeBlur(e, v, rise = 0, blur = 12, scale = null) {
+  e.style.opacity = v;
+  const tr = [];
+  if (rise) tr.push(`translateY(${rise}px)`);
+  if (scale != null) tr.push(`scale(${scale})`);
+  e.style.transform = tr.join(' ');
+  e.style.filter = v < .998 ? `blur(${((1 - v) * blur).toFixed(2)}px)` : 'none';
+}
+/* inOut envelope: rises over [a, a+ia], falls over [b, b+ob] */
+const env = (t, a, ia, b, ob, ein = E.outCubic, eout = E.inCubic) => ein(p(t, a, ia)) * (1 - eout(p(t, b, ob)));
+
+const ICON = {
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5v14"/></svg>',
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></svg>',
+  wave: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4.6" y="8.5" width="2.6" height="7" rx="1.3"/><rect x="8.9" y="5" width="2.6" height="14" rx="1.3"/><rect x="13.2" y="5" width="2.6" height="14" rx="1.3"/><rect x="17.5" y="8.5" width="2.6" height="7" rx="1.3"/></svg>',
+  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path class="ck" d="M20 6 9 17l-5-5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0"/></svg>',
+  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>',
+  code: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>',
+  globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>',
+  doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M16 13H8M16 17H8M10 9H8"/></svg>',
+  voice: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 10v3M6 6v11M10 3v18M14 8v7M18 5v13M22 10v3"/></svg>',
+  bulb: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5M9 18h6M10 22h4"/></svg>',
+  spark: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.1 6.4 6.4 2.1-6.4 2.1L12 19.5l-2.1-6.4L3.5 11l6.4-2.1Z"/><path d="M19 15.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9Z"/></svg>',
+  cursor: '<svg viewBox="0 0 24 24"><path d="M4.5 2.5 19 11.6l-6.6 1.5 4 7-2.7 1.5-4-7L5 19.2Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>',
+  orbit: '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="4"/><g class="planet"><circle cx="24" cy="9" r="5.5" fill="currentColor"/></g></svg>',
+};
+const LOGO_SRC = 'assets/decode-logo.png';
+
+/* ---------- words / typing ---------- */
+/* text supports *accent* segments, rendered with the brand gradient */
+function makeWords(parent, text) {
+  const spans = [];
+  const parts = text.split(' ');
+  parts.forEach((wd, i) => {
+    const s = el('span', 'w', parent);
+    if (/^\*.*\*[.,]?$/.test(wd)) { const m = wd.match(/^\*(.*)\*([.,]?)$/); s.classList.add('grad'); s.textContent = m[1] + m[2]; }
+    else s.textContent = wd;
+    spans.push(s);
+    if (i < parts.length - 1) parent.appendChild(document.createTextNode(' '));
+  });
+  return spans;
+}
+function animWords(spans, lt, inAt, stagger, dur, outAt, outDur, rise = 30, blur = 14) {
+  spans.forEach((s, i) => {
+    const a = E.outCubic(p(lt, inAt + i * stagger, dur));
+    const b = outAt == null ? 0 : E.inCubic(p(lt, outAt + i * .03, outDur));
+    const v = a * (1 - b);
+    s.style.opacity = v.toFixed(4);
+    s.style.transform = `translateY(${((1 - a) * rise - b * rise * .7).toFixed(2)}px)`;
+    s.style.filter = v < .998 ? `blur(${((1 - v) * blur).toFixed(2)}px)` : 'none';
+  });
+}
+/* human-ish typing: deterministic per-character timings */
+const typeCache = new Map();
+function typedCount(text, lt, start, cps) {
+  const key = text + '|' + cps;
+  let ts = typeCache.get(key);
+  if (!ts) {
+    const r = rng(text.length * 7919 + cps * 31);
+    ts = []; let acc = 0;
+    for (let i = 0; i < text.length; i++) {
+      let d = (1 / cps) * (0.55 + r() * 0.9);
+      if (text[i - 1] === ' ') d *= 1.25;
+      if (/[,.?]/.test(text[i - 1] || '')) d *= 2.2;
+      acc += d; ts.push(acc);
+    }
+    typeCache.set(key, ts);
+  }
+  const t = lt - start;
+  let n = 0; while (n < ts.length && ts[n] <= t) n++;
+  return n;
+}
+const typeDur = (text, cps) => { typedCount(text, 0, 0, cps); return typeCache.get(text + '|' + cps).at(-1); };
+
+/* ---------- timeline ----------
+   Scenes overlap by OV seconds so every cut is a crossfade. */
+const OV = 0.2;
+const TL = {};
+{
+  let cur = 0;
+  for (const [name, dur] of [
+    ['picker', 5.1], ['intro', 3.7], ['promise', 4.0],
+    ['hThink', 2.7], ['think', 11.5],
+    ['hCode', 2.7], ['code', 10.7],
+    ['hRes', 2.7], ['research', 9.2],
+    ['hWrite', 2.7], ['write', 8.7],
+    ['hVoice', 2.6], ['voice', 6.2],
+    ['brand', 3.8], ['cta', 2.4], ['logo', 4.2],
+  ]) { TL[name] = [cur, cur + dur]; cur = cur + dur - OV; }
+}
+const DURATION = TL.logo[1];
+
+/* ---------- background: the dithered dot field from decodeai.net ---------- */
+const bgc = $('bg'), bx = bgc.getContext('2d');
+const fxc = $('fx'), fx = fxc.getContext('2d');
+const topc = $('top'), tx = topc.getContext('2d');
+const SP = 10, DS = 3.2;
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + .5) / 16);
+const UI_SCENES = ['think', 'code', 'research', 'write'];
+function bgLevel(t) {
+  let ui = 0;
+  for (const n of UI_SCENES) { const [a, b] = TL[n]; ui = Math.max(ui, smooth(a - .2, a + .6, t) * (1 - smooth(b - .8, b, t))); }
+  const intro = smooth(0, 1.2, t);
+  return intro * (1 - .6 * ui);
+}
+function drawBg(t) {
+  bx.fillStyle = '#07080b'; bx.fillRect(0, 0, W, H);
+  const lv = bgLevel(t);
+  if (lv < .01) return;
+  bx.fillStyle = 'rgb(44, 86, 166)';
+  const cols = W / SP, rows = H / SP;
+  const lx = 330 + Math.sin(t * .11) * 70, ly = 600 + Math.cos(t * .09) * 50;
+  const rx = 1600 + Math.cos(t * .1) * 60, ry = 440 + Math.sin(t * .13) * 60;
+  for (let j = 0; j < rows; j++) {
+    const y = j * SP + 3;
+    for (let i = 0; i < cols; i++) {
+      const x = i * SP + 3;
+      const dl = ((x - lx) ** 2) / (720 ** 2) + ((y - ly) ** 2) / (600 ** 2);
+      const dr = ((x - rx) ** 2) / (680 ** 2) + ((y - ry) ** 2) / (560 ** 2);
+      let m = Math.max(1 - dl, 1 - dr, .16);
+      const n = fbm(x * .0042 + t * .05, y * .0042 - t * .032);
+      const f = m * (.25 + .9 * n) * lv;
+      const th = BAYER[(j & 3) * 4 + (i & 3)];
+      const a = smooth(th - .07, th + .07, f);
+      if (a < .02) continue;
+      bx.globalAlpha = a * .85;
+      bx.fillRect(x, y, DS, DS);
+    }
+  }
+  bx.globalAlpha = 1;
+  // soft vignette keeps edges calm
+  const g = bx.createRadialGradient(960, 540, 300, 960, 540, 1150);
+  g.addColorStop(0, 'rgba(7,8,11,0)'); g.addColorStop(1, 'rgba(7,8,11,.82)');
+  bx.fillStyle = g; bx.fillRect(0, 0, W, H);
+}
+
+/* ---------- scene registry ---------- */
+const SCENES = [];
+function addScene(name, build, update, opts = {}) {
+  const [s, e] = TL[name];
+  const root = el('div', 'scene', scenesEl);
+  const ctx = { root, dur: e - s, name };
+  build(ctx);
+  SCENES.push({ name, s, e, root, ctx, update, push: opts.push ?? .016 });
+}
+function seek(t) {
+  t = clamp(t, 0, DURATION - 1e-6);
+  drawBg(t);
+  fx.clearRect(0, 0, W, H);
+  tx.clearRect(0, 0, W, H);
+  for (const sc of SCENES) {
+    const on = t >= sc.s && t < sc.e;
+    if (on !== sc.on) { sc.root.style.display = on ? 'block' : 'none'; sc.on = on; }
+    if (!on) continue;
+    const lt = t - sc.s;
+    sc.root.style.transform = `scale(${(1 + sc.push * lt / sc.ctx.dur).toFixed(5)})`;
+    sc.update(lt, sc.ctx, t);
+  }
+}
+
+/* ---------- shared components ---------- */
+function makeComposer(parent) {
+  const c = el('div', 'composer', parent);
+  const inn = el('div', 'cp-in', c);
+  el('div', 'cp-icon', inn, ICON.plus);
+  const txt = el('div', 'cp-text', inn);
+  const ph = el('span', 'cp-ph', txt, 'How can I help you?');
+  const typed = el('span', '', txt);
+  TYPED.push(typed);
+  const caret = el('span', 'caret', txt);
+  el('div', 'cp-icon', inn, ICON.mic);
+  const send = el('div', 'cp-send', inn);
+  const wave = el('div', '', send, ICON.wave);
+  const up = el('div', '', send, ICON.up);
+  return { c, inn, ph, typed, caret, send, wave, up };
+}
+/* standard composer behaviour: appear, type, send. Returns sendAt. */
+function runComposer(cp, lt, text, o) {
+  const { inAt = 0, typeAt = .7, cps = 23, outAt } = o;
+  const n = typedCount(text, lt, typeAt, cps);
+  const sendAt = typeAt + typeDur(text, cps) + .3;
+  cp.typed.textContent = text.slice(0, n);
+  cp.ph.style.opacity = n ? 0 : 1;
+  const typing = lt >= typeAt && n < text.length;
+  cp.caret.style.opacity = lt > sendAt ? 0 : (typing || Math.floor(lt * 2.2) % 2 === 0) ? 1 : 0;
+  const hasText = clamp(n);
+  cp.wave.style.opacity = 1 - hasText; cp.up.style.opacity = hasText;
+  const press = lt > sendAt ? Math.sin(Math.PI * p(lt, sendAt, .22)) : 0;
+  cp.send.style.transform = `scale(${1 - press * .16})`;
+  cp.send.style.background = press > 0 ? `rgb(${247 - press * 100},${247 - press * 70},255)` : '#f7f7f7';
+  const a = E.outQuint(p(lt, inAt, .6));
+  const b = outAt != null ? E.inOutCubic(p(lt, outAt, .5)) : 0;
+  const v = a * (1 - b);
+  setStyle(cp.c, { left: '420px', top: '494px', width: '1080px', height: '92px', borderRadius: '46px' });
+  cp.c.style.opacity = v;
+  cp.c.style.transform = `translateY(${(1 - a) * 40 - b * 60}px) scale(${lerp(.96, 1, a) - b * .04})`;
+  cp.c.style.filter = v < .998 ? `blur(${(1 - v) * 10}px)` : 'none';
+  return sendAt;
+}
+function makeThinking(parent, phrases) {
+  const wrap = el('div', 'thinking', parent);
+  const items = phrases.map(ph => el('div', 'think-ph', wrap, ph));
+  return { wrap, items };
+}
+/* shimmer + left-to-right wipe between phrases (as in the reference) */
+function runThinking(th, lt, start, step) {
+  const sweep = ((lt * .75) % 1);
+  th.items.forEach((it, i) => {
+    const a = start + i * step, b = a + step;
+    const rev = E.inOutSine(p(lt, a, .55)) * 125;
+    const hide = i === th.items.length - 1 ? E.inOutSine(p(lt, b - .3, .5)) * 125 : E.inOutSine(p(lt, b, .55)) * 125;
+    if (lt < a || hide >= 124) { it.style.opacity = 0; return; }
+    it.style.opacity = 1;
+    const m = hide > 0
+      ? `linear-gradient(90deg, transparent ${hide - 25}%, #000 ${hide}%)`
+      : `linear-gradient(90deg, #000 ${rev - 25}%, transparent ${rev}%)`;
+    it.style.webkitMaskImage = m; it.style.maskImage = m;
+    it.style.backgroundPosition = `${lerp(130, -30, sweep)}% 0`;
+  });
+}
+
+/* =========================================================================
+   SCENE 1: the scattered toolbox collapses into DeCode
+   ========================================================================= */
+const TOOLS = [
+  ['chat', 'Chat', 'One app for questions'],
+  ['code', 'Code editor', 'Another for building'],
+  ['globe', 'Search', 'Another for research'],
+  ['doc', 'Docs', 'Another for writing'],
+  ['voice', 'Voice notes', 'Another for talking'],
+  ['bulb', 'Notes', 'And one more for ideas'],
+];
+addScene('picker', ctx => {
+  const card = el('div', 'card picker', ctx.root);
+  ctx.card = card;
+  ctx.hover = el('div', 'phover', card);
+  ctx.rows = TOOLS.map(([ic, t, s], i) => {
+    const r = el('div', 'prow', card, `<div class="ptile">${ICON[ic]}</div><div><div class="ptitle">${t}</div><div class="psub">${s}</div></div>`);
+    r.style.top = (10 + i * 84) + 'px';
+    return r;
+  });
+  const dc = el('div', 'prow', card, `<div class="ptile" style="background:#0d0e12"><img src="${LOGO_SRC}" style="width:36px"></div><div><div class="ptitle">DeCode</div><div class="psub">One workspace for all of it</div></div><div class="pcheck">${ICON.check}</div>`);
+  dc.style.top = '10px';
+  ctx.dc = dc; ctx.ck = dc.querySelector('.ck');
+}, (lt, ctx) => {
+  const ROW = 84, PAD = 20;
+  const open = E.spring(p(lt, .9, .9));
+  const close = E.inOutQuint(p(lt, 3.15, .6));
+  const n = 1 + 5 * open - 5 * close;
+  const h = PAD + ROW * n;
+  setStyle(ctx.card, { height: h + 'px', top: (540 - h / 2) + 'px' });
+  const appear = E.outQuint(p(lt, .05, .8)), leave = E.inCubic(p(lt, 4.55, .5));
+  fadeBlur(ctx.card, appear * (1 - leave), (1 - appear) * 30 - leave * 30, 10, lerp(.94, 1, appear));
+  ctx.rows.forEach((r, i) => {
+    const a = i === 0 ? 1 : E.outCubic(p(lt, 1.0 + i * .07, .45));
+    const c = 1 - E.inCubic(p(lt, 3.05 + (5 - i) * .03, .35));
+    r.style.opacity = a * c * (i === 0 ? (1 - E.inCubic(p(lt, 3.2, .4))) : 1);
+    r.style.transform = `translateY(${(1 - a) * 18}px)`;
+  });
+  // a hover highlight scans the list: "so many tools"
+  const scan = clamp((lt - 1.7) / 1.25) * 5;
+  const hv = Math.min(4.999, scan);
+  const k = Math.floor(hv), f = E.inOutCubic(hv - k);
+  ctx.hover.style.top = (10 + lerp(k, k + 1, f) * ROW) + 'px';
+  ctx.hover.style.opacity = env(lt, 1.55, .3, 2.9, .3);
+  const d = E.outCubic(p(lt, 3.55, .5));
+  fadeBlur(ctx.dc, d, (1 - d) * 16, 10);
+  ctx.ck.style.strokeDashoffset = 1 - E.inOutCubic(p(lt, 3.95, .45));
+}, { push: .02 });
+
+/* =========================================================================
+   Headline scenes (type-on by word, like the reference film)
+   ========================================================================= */
+function headline(name, lines, o = {}) {
+  addScene(name, ctx => {
+    const h = el('div', 'headline', ctx.root);
+    if (o.size) h.style.fontSize = o.size + 'px';
+    ctx.words = [];
+    lines.forEach(L => { const line = el('div', 'line', h); ctx.words.push(...makeWords(line, L)); });
+  }, (lt, ctx) => {
+    animWords(ctx.words, lt, o.inAt ?? .15, o.stagger ?? .12, .6, ctx.dur - .62, .5);
+    if (o.extra) o.extra(lt, ctx);
+  }, { push: .03 });
+}
+headline('intro', ['Introducing *DeCode*'], { size: 96, stagger: .2 });
+headline('promise', ['One place to take an idea', 'from first thought to launch day'], { stagger: .1 });
+headline('hThink', ['It starts with a question']);
+headline('hCode', ['Then the plan becomes code']);
+headline('hRes', ['The web fills in the facts']);
+headline('hWrite', ['Your words tell the story']);
+headline('hVoice', ['Then just say the word']);
+headline('brand', ['Think, code, research, and create', 'with *DeCode.*'], { stagger: .13, size: 92 });
+headline('cta', ['Try it at *decodeai.net*'], { stagger: .14 });
+
+/* =========================================================================
+   THINK: question -> thinking -> a four-week plan
+   ========================================================================= */
+const Q_THINK = 'Plan the launch of Orbit, my habit app. We ship in 4 weeks.';
+addScene('think', ctx => {
+  ctx.cp = makeComposer(ctx.root);
+  ctx.th = makeThinking(ctx.root, ['Thinking', 'Mapping out four weeks', 'Planning the launch']);
+  ctx.view = el('div', 'abs', ctx.root); ctx.view.style.inset = '0';
+  ctx.bub = el('div', 'bubble', ctx.view, Q_THINK); ctx.bub.style.top = '120px';
+  ctx.txt = el('div', 'resp', ctx.view); ctx.txt.style.top = '262px';
+  ctx.txtWords = makeWords(ctx.txt, "Here's a four-week plan for Orbit. Each week sets up the next, so launch day is just the final step.");
+  const g = el('div', 'card gantt', ctx.view); ctx.g = g;
+  el('div', 'g-title', g, `Orbit launch plan <span class="chip">4 weeks</span>`);
+  const X0 = 300, WK = (1160 - 44 - X0) / 4;
+  ctx.X0 = X0; ctx.WK = WK;
+  for (let i = 0; i < 4; i++) {
+    const w = el('div', 'g-week', g, 'Week ' + (i + 1)); w.style.left = (X0 + i * WK + 16) + 'px';
+    const v = el('div', 'g-vline', g); v.style.left = (X0 + i * WK) + 'px';
+  }
+  el('div', 'g-vline', g).style.left = (X0 + 4 * WK) + 'px';
+  const ROWS = [
+    ['Design', 0, 1.1, 'Brand + wireframes', '#93b2ff'],
+    ['Build', .9, 2.9, 'App + landing page', '#a9a4ff'],
+    ['Private beta', 2.6, 3.65, '50 early testers', '#c7b0ff'],
+  ];
+  ctx.rows = ROWS.map(([lab, a, b, txt, col], i) => {
+    const y = 165 + i * 84;
+    const L = el('div', 'g-label', g, lab); L.style.top = y + 'px';
+    const bar = el('div', 'g-bar', g, `<span>${txt}</span>`);
+    setStyle(bar, { top: y + 'px', left: (X0 + a * WK) + 'px', background: col });
+    return { L, bar, w: (b - a) * WK, span: bar.firstChild };
+  });
+  const y3 = 165 + 3 * 84;
+  ctx.lab3 = el('div', 'g-label', g, 'Launch'); ctx.lab3.style.top = y3 + 'px';
+  ctx.mile = el('div', 'g-mile', g); setStyle(ctx.mile, { left: (X0 + 4 * WK - 15) + 'px', top: (y3 + 11) + 'px' });
+  ctx.ring = el('div', 'g-ring', g); setStyle(ctx.ring, { left: (X0 + 4 * WK - 15) + 'px', top: (y3 + 11) + 'px' });
+  ctx.mlab = el('div', 'g-milelabel', g, 'Launch day'); setStyle(ctx.mlab, { right: (1160 - (X0 + 4 * WK) + 42) + 'px', top: (y3 + 12) + 'px' });
+}, (lt, ctx, t) => {
+  const sendAt = runComposer(ctx.cp, lt, Q_THINK, { inAt: 0, typeAt: .7, cps: 32, outAt: 99 });
+  // composer leaves right after send
+  const out = E.inOutCubic(p(lt, sendAt + .15, .5));
+  if (out > 0) { const v = 1 - out; ctx.cp.c.style.opacity = v; ctx.cp.c.style.transform = `translateY(${-out * 70}px) scale(${1 - out * .05})`; ctx.cp.c.style.filter = `blur(${out * 10}px)`; }
+  const thAt = sendAt + .5;
+  runThinking(ctx.th, lt, thAt, 1.0);
+  const rAt = thAt + 3.05;
+  const s0 = t - lt; cue('send1', s0 + sendAt); cue('think1', s0 + thAt); cue('plan', s0 + rAt); cue('milestone', s0 + rAt + 2.3);
+  // response view
+  const vb = E.outQuint(p(lt, rAt, .7));
+  const vout = E.inCubic(p(lt, ctx.dur - .55, .5));
+  ctx.view.style.opacity = 1 - vout;
+  ctx.view.style.transform = `translateY(${-vout * 30}px)`;
+  ctx.view.style.filter = vout > .002 ? `blur(${vout * 10}px)` : 'none';
+  fadeBlur(ctx.bub, vb, (1 - vb) * 30, 10);
+  ctx.view.style.display = lt < rAt ? 'none' : 'block';
+  animWords(ctx.txtWords, lt, rAt + .25, .028, .45, null, 0, 14, 8);
+  const gIn = E.outQuint(p(lt, rAt + .7, .8));
+  fadeBlur(ctx.g, gIn, (1 - gIn) * 50, 12, lerp(.97, 1, gIn));
+  ctx.rows.forEach((r, i) => {
+    const a = E.outExpo(p(lt, rAt + 1.2 + i * .32, .9));
+    r.bar.style.width = (r.w * a) + 'px';
+    r.span.style.opacity = E.outCubic(p(lt, rAt + 1.55 + i * .32, .4));
+    r.L.style.opacity = E.outCubic(p(lt, rAt + 1.0 + i * .32, .4));
+  });
+  const m = p(lt, rAt + 2.3, .6);
+  ctx.lab3.style.opacity = E.outCubic(p(lt, rAt + 2.0, .4));
+  ctx.mile.style.opacity = E.outCubic(m);
+  ctx.mile.style.transform = `rotate(45deg) scale(${E.outBack(m)})`;
+  const rp = p(lt, rAt + 2.45, 1.1);
+  ctx.ring.style.opacity = rp > 0 && rp < 1 ? (1 - rp) : 0;
+  ctx.ring.style.transform = `scale(${1 + rp * 2.4})`;
+  const ml = E.outCubic(p(lt, rAt + 2.55, .5));
+  ctx.mlab.style.opacity = ml; ctx.mlab.style.transform = `translateX(${(1 - ml) * 20}px)`;
+});
+
+/* =========================================================================
+   CODE: composer expands into an editor, then the page renders
+   ========================================================================= */
+const Q_CODE = "Build Orbit's landing page with a waitlist form.";
+const T = (c, s) => [c, s];
+const CODE = [
+  [T('t-kw', 'import'), T('', ' { useState } '), T('t-kw', 'from'), T('t-str', ' "react"'), T('t-p', ';')],
+  [T('t-kw', 'import'), T('', ' { Orbit } '), T('t-kw', 'from'), T('t-str', ' "./orbit"'), T('t-p', ';')],
+  [],
+  [T('t-kw', 'export default function'), T('t-fn', ' Landing'), T('t-p', '() {')],
+  [T('t-kw', '  const'), T('', ' [email, setEmail] = '), T('t-fn', 'useState'), T('t-p', '('), T('t-str', '""'), T('t-p', ');')],
+  [T('t-kw', '  const'), T('', ' [joined, setJoined] = '), T('t-fn', 'useState'), T('t-p', '('), T('t-num', 'false'), T('t-p', ');')],
+  [],
+  [T('t-kw', '  return'), T('t-p', ' (')],
+  [T('t-p', '    <'), T('t-tag', 'main'), T('t-attr', ' className'), T('t-p', '='), T('t-str', '"hero"'), T('t-p', '>')],
+  [T('t-p', '      <'), T('t-tag', 'Orbit'), T('t-attr', ' size'), T('t-p', '={'), T('t-num', '96'), T('t-p', '} />')],
+  [T('t-p', '      <'), T('t-tag', 'h1'), T('t-p', '>'), T('', 'Small habits. Big orbit.'), T('t-p', '</'), T('t-tag', 'h1'), T('t-p', '>')],
+  [T('t-p', '      <'), T('t-tag', 'p'), T('t-p', '>'), T('', 'Check in once a day. Watch your streak grow.'), T('t-p', '</'), T('t-tag', 'p'), T('t-p', '>')],
+  [T('t-p', '      <'), T('t-tag', 'form'), T('t-attr', ' onSubmit'), T('t-p', '={() => '), T('t-fn', 'setJoined'), T('t-p', '('), T('t-num', 'true'), T('t-p', ')}>')],
+  [T('t-p', '        <'), T('t-tag', 'input'), T('t-attr', ' value'), T('t-p', '={'), T('', 'email'), T('t-p', '}'), T('t-attr', ' onChange'), T('t-p', '={'), T('t-fn', 'setEmail'), T('t-p', '} />')],
+  [T('t-p', '        <'), T('t-tag', 'button'), T('t-p', '>{'), T('', 'joined ? '), T('t-str', '"You\'re on the list"'), T('', ' : '), T('t-str', '"Join the waitlist"'), T('t-p', '}</'), T('t-tag', 'button'), T('t-p', '>')],
+  [T('t-p', '      </'), T('t-tag', 'form'), T('t-p', '>')],
+  [T('t-p', '    </'), T('t-tag', 'main'), T('t-p', '>')],
+  [T('t-p', '  );')],
+  [T('t-p', '}')],
+];
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const CODE_LEN = CODE.map(l => l.reduce((a, [, s]) => a + s.length, 0));
+const CODE_TOTAL = CODE_LEN.reduce((a, b) => a + b + 4, 0);
+function codeHTML(line, n) {
+  let out = '', left = n;
+  for (const [c, s] of line) { if (left <= 0) break; const part = s.slice(0, left); left -= part.length; out += c ? `<span class="${c}">${esc(part)}</span>` : esc(part); }
+  return out;
+}
+addScene('code', ctx => {
+  ctx.cp = makeComposer(ctx.root);
+  const ed = el('div', 'card', ctx.root); ctx.ed = ed;
+  setStyle(ed, { left: '300px', top: '150px', width: '1320px', height: '780px' });
+  const head = el('div', 'ed-head', ed);
+  el('div', 'ed-tab', head, '<span class="ed-dot"></span>landing.tsx');
+  el('div', 'ed-tab', head, 'orbit.tsx').style.background = 'transparent';
+  ctx.status = el('div', 'ed-status', head);
+  const body = el('div', 'ed-body', ed);
+  ctx.hl = el('div', 'ed-hl', body);
+  ctx.lines = CODE.map((_, i) => {
+    const L = el('div', 'ed-line', body);
+    el('span', 'ed-ln', L, String(i + 1));
+    const c = el('span', 'ed-code', L); CODE_EL.push(c); return c;
+  });
+  // browser preview
+  const br = el('div', 'card browser', ctx.root); ctx.br = br;
+  setStyle(br, { left: '800px', top: '196px', width: '1000px', height: '690px', borderRadius: '22px' });
+  el('div', 'br-bar', br, '<i style="background:#ee6a5f"></i><i style="background:#f5bd4f"></i><i style="background:#61c454"></i><div class="br-url">localhost:3000</div>');
+  const op = el('div', 'op', br);
+  el('div', 'op-nav', op, `<span style="width:34px;height:34px;color:#ff7a45;display:block" class="orb-s">${ICON.orbit}</span>Orbit<span class="r">Sign in</span>`);
+  ctx.orbBig = el('div', 'abs', op, ICON.orbit); setStyle(ctx.orbBig, { left: '458px', top: '100px', width: '84px', height: '84px', color: '#ff7a45' });
+  el('div', 'op-h1', op, 'Small habits. Big orbit.');
+  el('div', 'op-p', op, 'Check in once a day. Watch your streak grow.');
+  const form = el('div', 'op-form', op);
+  const inp = el('div', 'op-input', form);
+  ctx.inPh = el('span', 'ph', inp, 'you@example.com');
+  ctx.inTx = el('span', '', inp); TYPED.push(ctx.inTx);
+  ctx.inCaret = el('span', 'caret', inp); setStyle(ctx.inCaret, { background: '#15161a', height: '28px', verticalAlign: '-5px' });
+  const btn = el('div', 'op-btn', form); ctx.btn = btn;
+  ctx.b1 = el('span', '', btn, 'Join the waitlist');
+  ctx.b2 = el('span', '', btn, `You're on the list <svg viewBox="0 0 24 24" width="22" height="22" style="vertical-align:-4px" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`);
+  el('div', 'op-note', op, 'Launching this month. No spam, ever.');
+  ctx.planets = [...br.querySelectorAll('.planet')];
+  ctx.cursor = el('div', 'cursor', ctx.root, ICON.cursor);
+}, (lt, ctx, t) => {
+  const sendAt = runComposer(ctx.cp, lt, Q_CODE, { inAt: 0, typeAt: .7, cps: 32 });
+  // morph: composer pill grows into the editor window
+  const mAt = sendAt + .25;
+  const m = E.inOutQuint(p(lt, mAt, .8));
+  if (lt >= mAt) {
+    const from = [420, 494, 1080, 92, 46], to = [300, 150, 1320, 780, 28];
+    const r = from.map((v, i) => lerp(v, to[i], m));
+    setStyle(ctx.cp.c, { left: r[0] + 'px', top: r[1] + 'px', width: r[2] + 'px', height: r[3] + 'px', borderRadius: r[4] + 'px', transform: 'none', filter: 'none' });
+    ctx.cp.inn.style.opacity = 1 - E.outCubic(p(lt, mAt, .3));
+    ctx.cp.c.style.opacity = 1 - p(lt, mAt + .7, .2);
+  }
+  const edAt = mAt + .65;
+  ctx.ed.style.display = lt < edAt ? 'none' : 'block';
+  const typeStart = edAt + .25;
+  const cps = 330;
+  const n = Math.max(0, Math.floor((lt - typeStart) * cps));
+  let left = n, cur = 0;
+  ctx.lines.forEach((L, i) => {
+    const show = Math.max(0, Math.min(CODE_LEN[i], left));
+    L.innerHTML = codeHTML(CODE[i], show);
+    if (left > 0) cur = i;
+    left -= CODE_LEN[i] + 4;
+  });
+  const done = n >= CODE_TOTAL;
+  ctx.hl.style.top = (cur * 35) + 'px';
+  ctx.hl.style.opacity = done ? 1 - p(lt, typeStart + CODE_TOTAL / cps, .4) : (lt > typeStart ? 1 : 0);
+  ctx.status.innerHTML = done
+    ? `<span style="color:var(--accent);display:flex;width:22px;height:22px">${ICON.check}</span>Ready`
+    : `<span class="ed-dot" style="opacity:${.4 + .6 * Math.abs(Math.sin(lt * 5))}"></span>Writing`;
+  const edV = E.outCubic(p(lt, edAt, .3));
+  // preview slides in, editor steps back
+  const pvAt = typeStart + CODE_TOTAL / cps + .25;
+  const pv = E.inOutQuint(p(lt, pvAt, .9));
+  ctx.ed.style.opacity = edV * (1 - pv * .45);
+  ctx.ed.style.transform = `translateX(${-pv * 190}px) scale(${1 - pv * .08})`;
+  ctx.ed.style.filter = pv > .01 ? `blur(${pv * 1.5}px)` : 'none';
+  ctx.br.style.display = lt < pvAt ? 'none' : 'block';
+  ctx.br.style.opacity = E.outCubic(p(lt, pvAt, .6));
+  ctx.br.style.transform = `translateX(${(1 - pv) * 220}px) scale(${lerp(.94, 1, pv)})`;
+  ctx.planets.forEach(pl => { pl.style.transformOrigin = '24px 24px'; pl.style.transform = `rotate(${lt * 140}deg)`; });
+  // cursor fills the form
+  const c0 = pvAt + .5, c1 = c0 + .6, tyAt = c1 + .1, email = 'maya@example.com';
+  const tN = typedCount(email, lt, tyAt, 30);
+  const tEnd = tyAt + typeDur(email, 30);
+  const c2 = tEnd + .15, c3 = c2 + .5, click = c3 + .1;
+  const bx0 = 800, by0 = 196;
+  const pts = [[1500, 1000], [bx0 + 300, by0 + 54 + 412], [bx0 + 810, by0 + 54 + 414]];
+  let cx, cy;
+  if (lt < c1) { const k = E.inOutCubic(p(lt, c0, .7)); cx = lerp(pts[0][0], pts[1][0], k); cy = lerp(pts[0][1], pts[1][1], k); }
+  else if (lt < c2) { cx = pts[1][0]; cy = pts[1][1]; }
+  else { const k = E.inOutCubic(p(lt, c2, .5)); cx = lerp(pts[1][0], pts[2][0], k); cy = lerp(pts[1][1], pts[2][1], k); }
+  const press = Math.sin(Math.PI * p(lt, click, .2)) + Math.sin(Math.PI * p(lt, c1 - .05, .2));
+  ctx.cursor.style.opacity = E.outCubic(p(lt, c0, .3)) * (1 - E.inCubic(p(lt, ctx.dur - .6, .4)));
+  ctx.cursor.style.transform = `translate(${cx}px, ${cy}px) scale(${1 - press * .15})`;
+  ctx.inPh.style.opacity = tN ? 0 : 1;
+  ctx.inTx.textContent = email.slice(0, tN);
+  ctx.inCaret.style.opacity = lt > c1 && lt < click && (lt < tEnd || Math.floor(lt * 2.4) % 2 === 0) ? 1 : 0;
+  const ok = E.inOutCubic(p(lt, click + .1, .45));
+  const s0 = t - lt; cue('send2', s0 + sendAt); cue('morph', s0 + mAt); cue('preview', s0 + pvAt); cue('click1', s0 + c1 - .05); cue('click2', s0 + click); cue('success', s0 + click + .1);
+  ctx.btn.style.background = ok > 0 ? '#ff7a45' : '#15161a';
+  ctx.btn.style.transform = `scale(${1 - Math.sin(Math.PI * p(lt, click, .25)) * .06})`;
+  ctx.b1.style.transform = `translateY(${-ok * 64}px)`; ctx.b2.style.transform = `translateY(${(1 - ok) * 64}px)`;
+  // exit
+  const o = E.inCubic(p(lt, ctx.dur - .55, .5));
+  ctx.root.style.opacity = 1 - o;
+  ctx.root.style.filter = o > .002 ? `blur(${o * 10}px)` : 'none';
+});
+
+/* =========================================================================
+   RESEARCH: sources fly in, numbers land
+   ========================================================================= */
+const Q_RES = 'How do similar habit apps price their plans? Cite sources.';
+const SOURCES = [['Pricing pages', '#93b2ff', 'P'], ['App stores', '#a9e5b8', 'A'], ['Review sites', '#f5c38b', 'R'], ['Forums', '#c3a6ff', 'F'], ['News', '#7fd1ff', 'N'], ['Blogs', '#f5a3a3', 'B']];
+addScene('research', ctx => {
+  ctx.cp = makeComposer(ctx.root);
+  ctx.th = makeThinking(ctx.root, ['Searching the web', 'Reading 12 sources', 'Comparing prices']);
+  ctx.th.wrap.style.marginTop = '-110px';
+  ctx.view = el('div', 'abs', ctx.root); ctx.view.style.inset = '0';
+  ctx.bub = el('div', 'bubble', ctx.view, Q_RES); ctx.bub.style.top = '120px';
+  ctx.txt = el('div', 'resp', ctx.view); ctx.txt.style.top = '262px';
+  ctx.txtWords = makeWords(ctx.txt, "Across 12 similar apps, here's how pricing usually works:");
+  ctx.tiles = [0, 1, 2].map(i => { const t = el('div', 'card tile', ctx.view); t.style.left = (380 + i * 393.5) + 'px'; return t; });
+  // tile 1: ring
+  const t1 = ctx.tiles[0];
+  t1.innerHTML = `<svg class="abs" style="left:36px;top:150px" width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="60" fill="none" stroke="#23252e" stroke-width="16"/><circle class="ring" cx="75" cy="75" r="60" fill="none" stroke="#93b2ff" stroke-width="16" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" transform="rotate(-90 75 75)"/></svg><div class="big"></div><div class="lab">offer a free plan</div><div class="abs" style="left:210px;top:196px;font-size:22px;color:#868a96;line-height:1.4">Free first,<br>paid for more</div>`;
+  ctx.ring = t1.querySelector('.ring'); ctx.big1 = t1.querySelector('.big');
+  const t2 = ctx.tiles[1];
+  t2.innerHTML = `<div class="big"></div><div class="lab">median monthly price</div><div class="hist">${[28, 46, 70, 100, 62, 38, 22].map((h, i) => `<div data-h="${h}" class="${i === 3 ? 'on' : ''}"></div>`).join('')}</div>`;
+  ctx.big2 = t2.querySelector('.big'); ctx.hist = [...t2.querySelectorAll('.hist div')];
+  const t3 = ctx.tiles[2];
+  t3.innerHTML = `<div class="big"></div><div class="lab">median yearly price</div><div class="abs" style="left:36px;bottom:36px"><span class="chip" style="color:#a9e5b8">About 50% less than monthly</span></div><svg class="abs" style="left:36px;top:178px" width="300" height="60"><path class="spark" d="M0 50 C 60 46, 90 30, 140 28 S 230 12, 300 6" fill="none" stroke="#93b2ff" stroke-width="4" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`;
+  ctx.big3 = t3.querySelector('.big'); ctx.spark = t3.querySelector('.spark');
+  ctx.srcLab = el('div', 'abs', ctx.view, 'Sources'); setStyle(ctx.srcLab, { left: '380px', top: '752px', fontSize: '22px', color: '#868a96', fontWeight: 500 });
+  ctx.chips = SOURCES.map(([n, c, l]) => el('div', 'src-chip', ctx.root, `<i style="background:${c}">${l}</i>${n}`));
+  ctx.r = rng(42);
+  ctx.chipFrom = SOURCES.map(() => [(ctx.r() - .5) * 1700, (ctx.r() - .5) * 700, (ctx.r() - .5) * 40]);
+}, (lt, ctx, t) => {
+  const sendAt = runComposer(ctx.cp, lt, Q_RES, { inAt: 0, typeAt: .7, cps: 32, outAt: 99 });
+  const out = E.inOutCubic(p(lt, sendAt + .15, .5));
+  if (out > 0) { ctx.cp.c.style.opacity = 1 - out; ctx.cp.c.style.transform = `translateY(${-out * 70}px) scale(${1 - out * .05})`; ctx.cp.c.style.filter = `blur(${out * 10}px)`; }
+  const thAt = sendAt + .5;
+  runThinking(ctx.th, lt, thAt, .68);
+  const rAt = thAt + 2.1;
+  const s0 = t - lt; cue('send3', s0 + sendAt); cue('search', s0 + thAt); SOURCES.forEach((_, i) => cue('chip' + i, s0 + thAt + .25 + i * .12 + .35)); cue('results', s0 + rAt);
+  // chip layout: centred row during search, then the "Sources" row under the results
+  const widths = ctx.chips.map(c => c.offsetWidth);
+  const gap = 14, total = widths.reduce((a, b) => a + b, 0) + gap * (widths.length - 1);
+  let xA = 960 - total / 2, xB = 500;
+  const settle = E.inOutQuint(p(lt, rAt + .2, 1.0));
+  ctx.chips.forEach((c, i) => {
+    const fly = E.outQuint(p(lt, thAt + .25 + i * .12, .9));
+    const [fx0, fy0, rot] = ctx.chipFrom[i];
+    const ax = xA, ay = 560, bx = xB, by = 740;
+    const x = lerp(lerp(ax + fx0, ax, fly), bx, settle), y = lerp(lerp(ay + fy0, ay, fly), by, settle);
+    c.style.left = x + 'px'; c.style.top = y + 'px';
+    const v = fly * (1 - E.inCubic(p(lt, ctx.dur - .55, .45)));
+    c.style.opacity = v;
+    c.style.transform = `rotate(${(1 - fly) * rot}deg) scale(${lerp(.6, 1, fly)})`;
+    c.style.filter = v < .998 ? `blur(${(1 - fly) * 12}px)` : 'none';
+    xA += widths[i] + gap; xB += widths[i] + gap;
+  });
+  ctx.view.style.display = lt < rAt ? 'none' : 'block';
+  const vout = E.inCubic(p(lt, ctx.dur - .55, .5));
+  ctx.view.style.opacity = 1 - vout;
+  ctx.view.style.filter = vout > .002 ? `blur(${vout * 10}px)` : 'none';
+  const vb = E.outQuint(p(lt, rAt, .7));
+  fadeBlur(ctx.bub, vb, (1 - vb) * 30, 10);
+  animWords(ctx.txtWords, lt, rAt + .2, .04, .45, null, 0, 14, 8);
+  ctx.srcLab.style.opacity = E.outCubic(p(lt, rAt + .9, .5));
+  ctx.tiles.forEach((tl, i) => { const a = E.outQuint(p(lt, rAt + .45 + i * .15, .8)); fadeBlur(tl, a, (1 - a) * 60, 12); });
+  const c = E.outCubic(p(lt, rAt + .7, 1.2));
+  ctx.ring.style.strokeDashoffset = 1 - .75 * c;
+  ctx.big1.innerHTML = `${Math.round(9 * c)}<span style="color:#5d616d"> / 12</span>`;
+  ctx.big2.textContent = '$' + (4.99 * E.outCubic(p(lt, rAt + .85, 1.2))).toFixed(2);
+  ctx.big3.textContent = '$' + (29.99 * E.outCubic(p(lt, rAt + 1.0, 1.2))).toFixed(2);
+  ctx.hist.forEach((h, i) => { const k = E.outExpo(p(lt, rAt + .95 + i * .07, .8)); h.style.height = (+h.dataset.h * k) + '%'; });
+  ctx.spark.style.strokeDashoffset = 1 - E.inOutCubic(p(lt, rAt + 1.1, 1.2));
+});
+
+/* =========================================================================
+   WRITE: the launch post, then "make it warmer"
+   ========================================================================= */
+const S_A = 'Orbit is a calm little app for the habits you keep meaning to start.';
+const S_OLD = 'Check in once a day, watch your streak grow, and let the small wins add up.';
+const S_NEW = 'Show up once a day, watch your streak glow, and celebrate every small win along the way.';
+const S_P2 = "It's free to try, and it launches this month.";
+addScene('write', ctx => {
+  const d = el('div', 'card doc', ctx.root); ctx.doc = d;
+  el('div', 'doc-head', d, `${ICON.doc}<span>Orbit launch post</span><span class="r">Saved</span>`);
+  const body = el('div', 'doc-body', d);
+  ctx.title = el('div', 'doc-title', body); TYPED.push(ctx.title);
+  const text = el('div', 'doc-text', body); ctx.text = text;
+  const p1 = el('p', '', text);
+  ctx.wA = makeWords(p1, S_A);
+  p1.appendChild(document.createTextNode(' '));
+  ctx.sel = el('span', 'sel', p1);
+  ctx.wOld = makeWords(ctx.sel, S_OLD);
+  ctx.neu = el('span', '', p1);
+  ctx.wNew = makeWords(ctx.neu, S_NEW);
+  const p2 = el('p', '', text);
+  ctx.wP2 = makeWords(p2, S_P2);
+  ctx.ask = el('div', 'ask', text, `${ICON.spark}Ask DeCode`);
+  ctx.mini = el('div', 'mini', d, `<div class="mini-q"><b></b>${S_OLD}</div><div class="mini-in"><span class="mt"></span><span class="caret"></span></div><div class="cp-send">${ICON.up}</div>`);
+  ctx.miniT = ctx.mini.querySelector('.mt'); TYPED.push(ctx.miniT); ctx.miniC = ctx.mini.querySelector('.caret'); ctx.miniS = ctx.mini.querySelector('.cp-send');
+  ctx.cursor = el('div', 'cursor', ctx.root, ICON.cursor);
+}, (lt, ctx, t) => {
+  const a = E.outQuint(p(lt, 0, .8));
+  const o = E.inCubic(p(lt, ctx.dur - .55, .5));
+  fadeBlur(ctx.doc, a * (1 - o), (1 - a) * 60 - o * 30, 12, lerp(.96, 1, a));
+  const title = 'Meet Orbit';
+  ctx.title.textContent = title.slice(0, typedCount(title, lt, .6, 18));
+  animWords(ctx.wA, lt, 1.1, .055, .4, null, 0, 10, 6);
+  animWords(ctx.wOld, lt, 1.1 + ctx.wA.length * .055, .055, .4, null, 0, 10, 6);
+  const p2At = 1.1 + (ctx.wA.length + ctx.wOld.length) * .055 + .1;
+  animWords(ctx.wP2, lt, p2At, .055, .4, null, 0, 10, 6);
+  // select the second sentence
+  const selAt = 3.4;
+  const sel = E.inOutCubic(p(lt, selAt, .55));
+  const rwAt = 6.1;
+  const unsel = E.outCubic(p(lt, rwAt - .1, .3));
+  ctx.sel.style.backgroundSize = `${sel * 100}% 100%`;
+  ctx.sel.style.backgroundImage = unsel > 0 ? `linear-gradient(rgba(147,178,255,${.32 * (1 - unsel)}),rgba(147,178,255,${.32 * (1 - unsel)}))` : '';
+  // rewrite: old words wipe out, new words write in
+  const wipe = p(lt, rwAt, .5);
+  if (wipe >= 1) { ctx.sel.style.display = 'none'; } else { ctx.sel.style.display = ''; ctx.wOld.forEach((w, i) => { const k = E.inCubic(p(lt, rwAt + i * .02, .3)); if (lt >= rwAt) { w.style.opacity = 1 - k; w.style.filter = `blur(${k * 8}px)`; } }); }
+  ctx.neu.style.display = wipe >= 1 ? '' : 'none';
+  animWords(ctx.wNew, lt, rwAt + .5, .06, .45, null, 0, 12, 8);
+  const tint = 1 - E.inOutCubic(p(lt, rwAt + 1.6, .8));
+  ctx.wNew.forEach(w => { w.style.color = lt < rwAt + 1.6 ? 'var(--accent)' : `color-mix(in srgb, var(--accent) ${tint * 100}%, #d4d7df)`; });
+  // Ask DeCode pill above the selection
+  const lw = ctx.wOld[ctx.wOld.length - 1];
+  const px = lw.offsetLeft + lw.offsetWidth + 18, py = lw.offsetTop + (lw.offsetHeight - 52) / 2;
+  const askA = E.outBack(p(lt, 4.05, .45)), askO = E.inCubic(p(lt, 4.75, .3));
+  ctx.ask.style.left = px + 'px'; ctx.ask.style.top = py + 'px';
+  ctx.ask.style.opacity = clamp(askA) * (1 - askO);
+  ctx.ask.style.transform = `translateY(${(1 - askA) * 14}px) scale(${lerp(.85, 1, clamp(askA)) - Math.sin(Math.PI * p(lt, 4.55, .2)) * .06})`;
+  // cursor travels to the pill and clicks
+  const docL = 360 + 100, docT = 110 + 130;
+  const tgt = [docL + px + 70, docT + 76 + 30 + py + 22];
+  const k = E.inOutCubic(p(lt, 3.7, .75));
+  const cx = lerp(1500, tgt[0], k), cy = lerp(980, tgt[1], k);
+  const cOut = E.inCubic(p(lt, 4.9, .3));
+  ctx.cursor.style.opacity = E.outCubic(p(lt, 3.6, .3)) * (1 - cOut);
+  ctx.cursor.style.transform = `translate(${cx}px, ${cy}px) scale(${1 - Math.sin(Math.PI * p(lt, 4.5, .2)) * .15})`;
+  // mini composer with "Make it warmer"
+  const mi = E.outQuint(p(lt, 4.7, .6)), mo = E.inCubic(p(lt, rwAt + .2, .45));
+  fadeBlur(ctx.mini, mi * (1 - mo), (1 - mi) * 40 + mo * 20, 10);
+  const ask = 'Make it warmer.';
+  const n = typedCount(ask, lt, 5.05, 16);
+  ctx.miniT.textContent = ask.slice(0, n);
+  const sAt = 5.05 + typeDur(ask, 16) + .2;
+  ctx.miniC.style.opacity = lt > sAt ? 0 : (Math.floor(lt * 2.2) % 2 === 0 || n < ask.length) ? 1 : 0;
+  ctx.miniS.style.transform = `scale(${1 - Math.sin(Math.PI * p(lt, sAt, .22)) * .16})`;
+  const s0 = t - lt; cue('select', s0 + selAt); cue('click3', s0 + 4.5); cue('send4', s0 + sAt); cue('rewrite', s0 + rwAt + .5);
+}, { push: .014 });
+
+/* =========================================================================
+   VOICE: a living dot sphere; "Let's launch Orbit."
+   ========================================================================= */
+const ORB = (() => {
+  const N = 1500, pts = [], ga = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < N; i++) { const y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), th = ga * i; pts.push([Math.cos(th) * r, y, Math.sin(th) * r]); }
+  return pts;
+})();
+function drawOrb(ctx2, cx, cy, R, t, amp, speak, alpha) {
+  const ay = t * .45, ax = .35 + Math.sin(t * .6) * .12;
+  const cyA = Math.cos(ay), syA = Math.sin(ay), cxA = Math.cos(ax), sxA = Math.sin(ax);
+  // glow
+  const g = ctx2.createRadialGradient(cx, cy, R * .2, cx, cy, R * 1.9);
+  g.addColorStop(0, `rgba(147,178,255,${.22 * alpha * (0.6 + amp * .6)})`); g.addColorStop(1, 'rgba(147,178,255,0)');
+  ctx2.fillStyle = g; ctx2.fillRect(cx - R * 2, cy - R * 2, R * 4, R * 4);
+  const cr = Math.round(lerp(147, 236, speak)), cg = Math.round(lerp(178, 228, speak)), cb = 255;
+  ctx2.fillStyle = `rgb(${cr},${cg},${cb})`;
+  for (const [x0, y0, z0] of ORB) {
+    let x = x0 * cyA + z0 * syA, z = -x0 * syA + z0 * cyA;
+    let y = y0 * cxA - z * sxA; z = y0 * sxA + z * cxA;
+    const n = noise(x0 * 3 + t * 1.4, y0 * 3 + z0 * 2.1 - t);
+    const d = (1 + .05 * amp) * (1 + amp * (n - .5) * .16);
+    const px = cx + x * R * d, py = cy + y * R * d;
+    const depth = (z + 1) / 2;
+    const s = 1.6 + depth * 3.4;
+    ctx2.globalAlpha = alpha * (.18 + .82 * depth * depth);
+    ctx2.fillRect(px - s / 2, py - s / 2, s, s);
+  }
+  ctx2.globalAlpha = 1;
+}
+const SAY_USER = 'Okay DeCode, let\'s launch Orbit.';
+const SAY_BOT = 'Done. Orbit is live.';
+addScene('voice', ctx => {
+  ctx.badge = el('div', 'badge', ctx.root, '<b>New</b>Real-time voice is available in DeCode.');
+  ctx.c1 = el('div', 'cap', ctx.root); ctx.c1.style.top = '715px';
+  el('div', 'who', ctx.c1, 'You');
+  ctx.w1 = makeWords(el('div', 'say', ctx.c1), SAY_USER);
+  ctx.c2 = el('div', 'cap', ctx.root); ctx.c2.style.top = '715px';
+  el('div', 'who', ctx.c2, 'DeCode').style.color = 'var(--accent)';
+  ctx.w2 = makeWords(el('div', 'say', ctx.c2), SAY_BOT);
+  ctx.notif = el('div', 'card notif', ctx.root, `<div class="ic">${ICON.check}</div><div><div class="t1">Orbit is live</div><div class="t2">1,284 people on the waitlist were notified</div></div>`);
+}, (lt, ctx, t) => {
+  const o = E.inCubic(p(lt, ctx.dur - .55, .5));
+  const a = E.outQuint(p(lt, 0, .9));
+  const ub = env(lt, .8, .2, 2.2, .3, E.outCubic, E.inOutCubic), bb = env(lt, 2.75, .2, 3.6, .3, E.outCubic, E.inOutCubic);
+  const syll = .55 + .45 * Math.abs(Math.sin(lt * 11.5) * Math.sin(lt * 4.3 + 1));
+  const amp = .25 + 1.6 * Math.max(ub, bb) * syll;
+  const speak = E.inOutCubic(p(lt, 2.55, .4)) * (1 - E.inOutCubic(p(lt, 4.0, .6)));
+  drawOrb(fx, 960, 430, lerp(120, 210, a) * (1 + .02 * Math.sin(lt * 2)), t, amp * (1 - o), speak, a * (1 - o));
+  const bd = E.outCubic(p(lt, .1, .6));
+  fadeBlur(ctx.badge, bd * (1 - o), 0, 8);
+  ctx.badge.style.transform = `translateX(-50%) translateY(${(1 - bd) * -20}px)`;
+  const c1o = E.inCubic(p(lt, 2.35, .35));
+  ctx.c1.style.opacity = 1 - c1o; ctx.c1.style.filter = c1o > 0 ? `blur(${c1o * 10}px)` : 'none';
+  ctx.c1.style.transform = `translateY(${-c1o * 24}px)`;
+  ctx.c1.firstChild.style.opacity = E.outCubic(p(lt, .7, .3));
+  animWords(ctx.w1, lt, .8, .2, .4, null, 0, 16, 10);
+  ctx.c2.firstChild.style.opacity = E.outCubic(p(lt, 2.65, .3)) * (1 - o);
+  animWords(ctx.w2, lt, 2.75, .2, .4, ctx.dur - .55, .45, 16, 10);
+  const nA = E.outQuint(p(lt, 3.75, .8));
+  fadeBlur(ctx.notif, nA * (1 - o), (1 - nA) * 60, 12, lerp(.94, 1, nA));
+  ctx.notif.querySelector('.ck').style.strokeDashoffset = 1 - E.inOutCubic(p(lt, 4.05, .4));
+  const s0 = t - lt; cue('voiceUser', s0 + .8); cue('voiceBot', s0 + 2.75); cue('notif', s0 + 3.75);
+}, { push: .012 });
+
+/* =========================================================================
+   LOGO: wordmark backspaces to "D", the D bursts into the brand's dots,
+   the dots assemble into the DeCode mark.
+   ========================================================================= */
+const logoImg = new Image(); logoImg.src = LOGO_SRC;
+addScene('logo', ctx => {
+  const wm = el('div', 'wordmark', ctx.root); ctx.wm = wm;
+  ctx.wmT = el('span', '', wm, 'DeCode');
+  const r = rng(7);
+  const S = .78;
+  ctx.S = S;
+  ctx.parts = window.LOGO_POINTS.map(([x, y]) => {
+    const ang = r() * Math.PI * 2, rad = Math.sqrt(r());
+    return {
+      tx: 960 + x * S, ty: 540 + y * S,
+      sx: 960 + Math.cos(ang) * rad * 46, sy: 540 + Math.sin(ang) * rad * 52,
+      delay: r() * .3 + (Math.hypot(x, y) / 300) * .25,
+      curl: (r() - .5) * 260,
+      burst: [Math.cos(ang) * (60 + r() * 220), Math.sin(ang) * (60 + r() * 200)],
+    };
+  });
+}, (lt, ctx, t) => {
+  const word = 'DeCode';
+  const inA = E.outCubic(p(lt, .05, .45));
+  const del = Math.min(5, Math.floor(clamp((lt - .6) / .45) * 5.999));
+  ctx.wmT.textContent = word.slice(0, 6 - del);
+  const dOut = E.inCubic(p(lt, 1.05, .25));
+  ctx.wm.style.opacity = inA * (1 - dOut);
+  ctx.wm.style.filter = inA < .998 || dOut > 0 ? `blur(${(1 - inA) * 14 + dOut * 6}px)` : 'none';
+  ctx.wm.style.transform = `translateY(${(1 - inA) * 30}px) scale(${1 + dOut * .15})`;
+  // particles
+  const fly0 = 1.08;
+  cue('burst', t - lt + fly0); cue('logo', t - lt + 2.5);
+  if (lt > fly0) {
+    const solid = E.inOutCubic(p(lt, 2.3, .4));
+    const fin = E.inOutCubic(p(lt, 2.5, .35));
+    tx.fillStyle = '#f4f5f8';
+    for (const q of ctx.parts) {
+      const k = p(lt, fly0 + q.delay, .95);
+      const e = E.inOutCubic(k);
+      const b = Math.sin(Math.PI * Math.min(1, k * 1.25));
+      const mx = lerp(q.sx, q.tx, e) + q.burst[0] * b * .9 + (-(q.ty - q.sy)) / 400 * q.curl * b * .3;
+      const my = lerp(q.sy, q.ty, e) + q.burst[1] * b * .9;
+      const s = lerp(3.4, 8.8, solid) + (1 - e) * 1.5;
+      tx.globalAlpha = clamp(k * 6) * (1 - fin);
+      tx.fillRect(mx - s / 2, my - s / 2, s, s);
+    }
+    tx.globalAlpha = 1;
+    if (fin > 0 && logoImg.complete) {
+      const sc = ctx.S * lerp(.985, 1, fin);
+      tx.globalAlpha = fin;
+      tx.drawImage(logoImg, 960 - 302.5 * sc, 540 - 194.5 * sc, 602 * sc, 410 * sc);
+      tx.globalAlpha = 1;
+    }
+  }
+}, { push: .02 });
+
+/* final fade to black */
+function finalFade(t) { $('fade').style.opacity = E.inOutCubic(p(t, DURATION - .55, .5)); }
+const _seek = seek;
+window.seek = t => { _seek(t); finalFade(t); };
+window.DURATION = DURATION; window.FPS = FPS; window.TL = TL; window.CUES = CUES;
+const shown = e => { const sc = e.closest('.scene'); return sc && sc.style.display !== 'none'; };
+window.sfxState = () => ({
+  typed: TYPED.reduce((a, e) => a + (shown(e) ? e.textContent.length : 0), 0),
+  code: CODE_EL.reduce((a, e) => a + (shown(e) ? e.textContent.length : 0), 0),
+});
+const FONT_LOADS = ['400', '500', '600', '700'].map(w => document.fonts.load(`${w} 40px Geist`)).concat(['400', '500'].map(w => document.fonts.load(`${w} 20px "Geist Mono"`)));
+window.ready = Promise.all([...FONT_LOADS, document.fonts.ready, logoImg.decode().catch(() => {}), ...[...document.images].map(i => i.decode().catch(() => {}))]).then(() => { window.seek(0); return true; });
+
+/* ---------- preview player ---------- */
+function fit() {
+  const s = Math.min(innerWidth / W, (innerHeight - (RENDER ? 0 : 44)) / H);
+  stage.style.transform = RENDER ? 'none' : `scale(${s})`;
+  stage.style.left = RENDER ? '0' : ((innerWidth - W * s) / 2) + 'px';
+}
+addEventListener('resize', fit); fit();
+if (!RENDER) {
+  let playing = true, t0 = performance.now(), base = 0;
+  const q = new URLSearchParams(location.search);
+  if (q.has('t')) base = +q.get('t');
+  const scrub = $('scrub'), label = $('time'), btn = $('play');
+  const cur = () => playing ? (base + (performance.now() - t0) / 1000) % DURATION : base;
+  btn.onclick = () => { base = cur(); t0 = performance.now(); playing = !playing; btn.textContent = playing ? 'Pause' : 'Play'; };
+  scrub.oninput = () => { base = scrub.value / 1000 * DURATION; t0 = performance.now(); };
+  addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); btn.onclick(); } });
+  window.ready.then(() => {
+    const loop = () => { const t = cur(); window.seek(t); scrub.value = t / DURATION * 1000; label.textContent = t.toFixed(2) + 's / ' + DURATION.toFixed(1) + 's'; requestAnimationFrame(loop); };
+    loop();
+  });
+}
+</script>
+</body>
+</html>
