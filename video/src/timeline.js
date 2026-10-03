@@ -135,9 +135,13 @@ function buildScenes(C) {
           const g = ep(t, P.collapse + 0.02 * i, P.collapse + 0.28 + 0.02 * i, ease.inCubic);
           vis(r, { o: a * (1 - g), y: (1 - a) * 16 - g * 46 });
         });
-        const ho = ep(t, 1.8, 2.0) * (1 - ep(t, 3.05, 3.3));
-        const hk = ep(t, 1.85, 3.15, ease.inOutSine);
-        vis(hl, { o: ho, y: PAD + hk * IH * 5 });
+        // hover highlight walks the whole list, row by row, ending on the
+        // last item (Roblox Studio Assistant) before the menu collapses
+        const HL0 = 1.8, STEP = 0.205, MOVE = 0.13;
+        let row = 0;
+        for (let i = 1; i < items.length; i++) row += ep(t, HL0 + i * STEP - MOVE, HL0 + i * STEP, ease.inOutCubic);
+        const ho = ep(t, 1.72, 1.92) * (1 - ep(t, P.collapse - 0.08, P.collapse + 0.1));
+        vis(hl, { o: ho, y: PAD + row * IH });
         const f = ep(t, P.collapse + 0.32, P.collapse + 0.72, ease.outCubic);
         vis(final, { o: f, y: (1 - f) * 22 });
         const k = ep(t, P.select, P.select + 0.45, ease.outBack);
