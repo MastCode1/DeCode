@@ -249,6 +249,63 @@ function buildScenes(C) {
     };
   });
 
+  // 8b ── web research: prompt -> search -> answer with sources ──────────────
+  // Mirrors DeCode's own web activity UI: "Searching the web" -> "Reading
+  // sources" -> "Searched the web", inline source chips, and the
+  // "Sources · Web • N" action.
+  headlineScene(C.webTitle, [[['Researches the web, '], ['with sources', 'blue']]], { cps: 26 });
+
+  scene(C.web.appear - 0.05, C.web.out + 0.5, root => {
+    const Q = C.web;
+    const P5 = 'When is the next total solar eclipse I can see from Europe?';
+    const comp = new Composer(root, { text: P5, appear: Q.appear, typeStart: Q.type, cps: 40, sendAt: Q.send });
+    const chip = d => `<span class="src-chip" data-unit data-dur="0.14"><span class="src-chip__icon"><span class="web-glyph"></span></span>${d}</span>`;
+    const view = new ChatView(root, `
+      ${capsule(P5)}
+      <div class="activity" data-skip>
+        <div class="activity__row"><span class="web-glyph web-glyph--status"></span><span class="activity__label shimmer">Searching the web</span></div>
+        <div class="activity__row"><span class="web-glyph web-glyph--status"></span><span class="activity__label shimmer">Reading sources</span></div>
+        <div class="activity__row"><span class="web-glyph web-glyph--status"></span><span class="activity__label">Searched the web</span></div>
+      </div>
+      <div class="msg web-answer">
+        <p>The next one is on <strong>August 2, 2027</strong>. Totality crosses southern Spain and Gibraltar ${chip('timeanddate.com')}, then North Africa and the Middle East.</p>
+        <p>Near Luxor, Egypt, it lasts up to <strong>6 minutes 23 seconds</strong>, one of the longest total eclipses this century ${chip('nasa.gov')}.</p>
+        <div class="msg-actions" data-unit data-dur="0.3" data-pause="0.2"><span class="sources-btn"><span class="web-glyph web-glyph--btn"></span>Sources <b>Web • 2</b></span></div>
+      </div>`, { top: 230 });
+    const stream = new Stream(view.root, Q.stream, { wps: 24 });
+    const cap = view.root.querySelector('.capsule-row');
+    const rows = [...view.root.querySelectorAll('.activity__row')];
+    const answer = view.root.querySelector('.web-answer');
+    let focus;
+    return {
+      measure() {
+        comp.measure(); stream.measure(view.root);
+        const r = view.rel(answer);
+        focus = { cx: view.width / 2, cy: r.cy - 40, s: 1.14 };
+      },
+      update(t) {
+        comp.update(t);
+        stream.update(t);
+        const io = inOut(t, Q.chat, Q.out, { dIn: 0.45, sOut: 0.98 });
+        vis(view.root, { o: io.o });
+        if (io.o <= 0) return;
+        vis(cap, { o: ep(t, Q.chat, Q.chat + 0.4), y: (1 - ep(t, Q.chat, Q.chat + 0.5, ease.outCubic)) * 30 });
+        // status row: each label replaces the previous one in place
+        const marks = [Q.search, Q.read, Q.done, Infinity];
+        rows.forEach((row, i) => {
+          const a = ep(t, marks[i], marks[i] + 0.3, ease.outCubic);
+          const b = ep(t, marks[i + 1] - 0.12, marks[i + 1] + 0.12);
+          vis(row, { o: a * (1 - b), y: (1 - a) * 10 - b * 10 });
+          const label = row.querySelector('.shimmer');
+          if (label) label.style.backgroundPosition = `${(120 - (((t - Q.search) * 0.8) % 1) * 240).toFixed(1)}% 0`;
+        });
+        const z = ep(t, Q.zoom, Q.out + 0.3, ease.inOutSine);
+        view.apply(camLerp(view.rest(1), focus, z));
+        view.root.style.filter = io.blur > 0.05 ? `blur(${io.blur.toFixed(2)}px)` : '';
+      },
+    };
+  });
+
   // 9 ── Real-time: text only, as requested ─────────────────────────────────
   scene(C.realtime.start - 0.05, C.realtime.out + 0.5, root => {
     const R = C.realtime;

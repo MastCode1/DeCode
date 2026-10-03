@@ -102,6 +102,22 @@ body { font-family: 'Geist', system-ui, sans-serif; color: var(--text); -webkit-
 .status-inline { font-size: 32px; font-weight: 500; display: inline-block; white-space: nowrap; }
 .status-inline .shimmer { background-image: linear-gradient(90deg, #7a7a7a 0%, #7a7a7a 38%, #ffffff 50%, #7a7a7a 62%, #7a7a7a 100%); }
 
+/* ---------- web research (mirrors DeCode's .msg__activity / .msg__source-chip) ---------- */
+.web-glyph { display: inline-block; width: 100%; height: 100%; background: currentColor;
+  -webkit-mask: url(assets/decode-web-icon.png) center / contain no-repeat; mask: url(assets/decode-web-icon.png) center / contain no-repeat; }
+.activity { position: relative; height: 44px; margin: 0 0 22px; }
+.activity__row { position: absolute; left: 0; top: 0; display: inline-flex; align-items: center; gap: 14px; color: #9a9a9a; white-space: nowrap; }
+.web-glyph--status { width: 30px; height: 30px; color: #9a9a9a; }
+.activity__label { font-size: 25px; font-weight: 500; line-height: 36px; }
+.activity__label.shimmer { background-image: linear-gradient(90deg, #7a7a7a 0%, #7a7a7a 38%, #ffffff 50%, #7a7a7a 62%, #7a7a7a 100%); }
+.src-chip { display: inline-flex; align-items: center; gap: 9px; vertical-align: 1px; margin: 0 3px; padding: 4px 14px 4px 6px; min-height: 36px;
+  border-radius: 999px; background: #ffffff12; border: 1.5px solid #ffffff1f; color: #ffffffdb; font-size: 20px; font-weight: 600; line-height: 1; white-space: nowrap; }
+.src-chip__icon { display: inline-flex; align-items: center; justify-content: center; width: 25px; height: 25px; border-radius: 50%; background: #ffffff1f; color: #e8e8e8; padding: 4px; }
+.msg-actions { margin-top: 4px; }
+.sources-btn { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border-radius: 13px; color: #ffffff8c; font-size: 21px; font-weight: 650; }
+.sources-btn b { color: #ffffffb8; font-weight: 700; }
+.web-glyph--btn { width: 23px; height: 23px; }
+
 /* ---------- code block (mirrors DeCode's .cb component) ---------- */
 .cb { background: #202020; border: 1.5px solid #ffffff14; border-radius: 22px; overflow: hidden; box-shadow: 0 4px 18px #0000003d; margin: 4px 0 0; }
 .cb__toolbar { background: #050505; border-bottom: 1.5px solid #ffffff14; display: flex; justify-content: space-between; align-items: center; min-height: 76px; padding: 8px 14px 8px 26px; }

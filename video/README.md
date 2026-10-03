@@ -1,6 +1,6 @@
 # DeCode — launch motion piece
 
-A ~98 s, 1920×1080 / 30 fps motion-graphics film for DeCode. The structure,
+A ~110 s, 1920×1080 / 30 fps motion-graphics film for DeCode. The structure,
 pacing, and motion follow the reference launch video. The content is DeCode's:
 it is set in a dark theme on decodeai.net's blue dot-matrix background.
 
@@ -15,10 +15,11 @@ Output: `dist/decode-motion-graphics.mp4`
 | 0:09 | One AI workspace to think, code, research, and create. | |
 | 0:14 | Goes deeper when you need it to | *Pro* model: compound-interest question, "Starting thinking" → "Thinking" statuses, then the streamed answer with a table (figures verified) |
 | 0:32 | Answers fast when you want it to | *Instant* model: a quick team note |
-| 0:42 | Real-time is available in DeCode. | Text only, as requested |
-| 0:47 | DeCode is great at coding | Asks for a focus timer in a single HTML file. The code streams in a DeCode code block, **Run** opens the HTML preview, and Start counts down. Two more single-file previews follow (Game of Life, analog clock). |
-| 1:09 | Image Generation | Prompt → "Thinking" → the image appears in chat with "Here's your mountain lake at sunrise. Do you like it?" |
-| 1:25 | Everything you need, decoded. → Coming soon to decodeai.net → DeCode wordmark → logo | |
+| 0:42 | Researches the web, with sources | Asks when the next total solar eclipse visible from Europe is. The status goes "Searching the web" → "Reading sources" → "Searched the web", then the answer arrives with inline source chips (timeanddate.com, nasa.gov) and the "Sources · Web • 2" button |
+| 0:55 | Real-time is available in DeCode. | Text only, as requested |
+| 1:00 | DeCode is great at coding | Asks for a focus timer in a single HTML file. The code streams in a DeCode code block, **Run** opens the HTML preview, and Start counts down. Two more single-file previews follow (Game of Life, analog clock). |
+| 1:22 | Image Generation | Prompt → "Thinking" → the image appears in chat with "Here's your mountain lake at sunrise. Do you like it?" |
+| 1:38 | Everything you need, decoded. → Coming soon to decodeai.net → DeCode wordmark → logo | |
 
 ## Accuracy notes
 
@@ -27,8 +28,11 @@ Output: `dist/decode-motion-graphics.mp4`
   voice), plus Chat and Image generation.
 - **Model names and descriptions:** *Instant*, *High*, and *Pro* match the
   pricing page.
-- **Status labels:** "Starting thinking", "Thinking", and "Thought for N
-  seconds" are the strings the DeCode app itself uses.
+- **Status labels:** "Starting thinking", "Thinking", "Thought for N
+  seconds", "Searching the web", "Reading sources", and "Searched the web"
+  are the strings the DeCode app itself uses. The source chips and the
+  "Sources · Web • N" button copy the app's `.msg__source-chip` and
+  `.msg__sources-btn` components. The globe icon is the app's own asset.
 - **Coding:** DeCode writes code and previews it. It does not build multi-file
   projects, so the video shows exactly that: an HTML code block with
   Code/Run/Copy controls (modelled on the app's `.cb` component) and the Run

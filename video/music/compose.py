@@ -320,7 +320,7 @@ for tt, m, v in [(cue['picker']['select'], 84, 0.5), (cue['realtime']['start'], 
     add(fx, tt, bell(m, v), pan=0.15, gain=0.3)
 
 # soft UI clicks: send buttons, Run, Start
-for tt in [deep['send'], fast['send'], code['send'], img['send'], code['run'], code['start']]:
+for tt in [deep['send'], fast['send'], cue['web']['send'], code['send'], img['send'], code['run'], code['start']]:
     add(fx, tt, click(), pan=0.1, gain=0.5)
 
 # ---------------------------------------------------------------- dynamics
